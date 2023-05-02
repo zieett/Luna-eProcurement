@@ -4,8 +4,8 @@ import com.example.accountservice.dto.ProductDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 
-@FeignClient(value = "api-gateway")
+@FeignClient(value = "product-service/api")
 public interface ProductFeignClient {
-    @GetMapping("product-service/product")
+    @GetMapping("product")
     ProductDTO getProduct();
 }

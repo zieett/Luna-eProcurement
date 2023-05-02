@@ -1,28 +1,22 @@
-package com.example.accountservice.entity;
+package com.rmit.authservice.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
-@Table(name = "account")
-public class Account {
+public class UserCredential {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
-
-    private String email;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String name;
-    private String phoneNumber;
-    private String gender;
-
-
+    private String email;
+    private String password;
 }

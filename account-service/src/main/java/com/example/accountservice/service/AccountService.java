@@ -9,6 +9,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,13 +25,14 @@ public class AccountService {
         log.info("Account: {}",account);
         AccountDTO accountDTO = modelMapper.map(account,AccountDTO.class);
         log.info("Accountdto: {}",accountDTO);
-        accountDTO.setProductDTO(productFeignClient.getProduct());
         return accountDTO;
     }
     public List<Account> getAccounts(){
         return accountRepository.findAll();
     }
-    public Account createAccount(Account account){
-        return accountRepository.save(account);
+    public ResponseEntity<String> createAccount(AccountDTO accountDTO){
+        Account account = modelMapper.map(accountDTO,Account.class);
+        accountRepository.save(account);
+        return ResponseEntity.ok("Account create successfully");
     }
 }

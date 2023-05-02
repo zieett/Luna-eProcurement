@@ -1,4 +1,4 @@
-//package com.example.accountservice.config;
+//package com.rmit.authservice.config;
 //
 //
 //import feign.codec.Decoder;
