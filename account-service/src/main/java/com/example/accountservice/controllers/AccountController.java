@@ -7,6 +7,7 @@ import com.example.accountservice.feignclients.ProductFeignClient;
 import com.example.accountservice.service.AccountService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -38,7 +39,7 @@ public class AccountController {
         return accountService.getAccounts();
     }
     @PostMapping(value = "/account",consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> createAccount(@RequestBody AccountDTO accountDTO){
+    public ResponseEntity<String> createAccount(@Valid @RequestBody AccountDTO accountDTO){
         return accountService.createAccount(accountDTO);
     }
 }

@@ -6,6 +6,7 @@ import com.example.accountservice.exception.AccountNotFoundException;
 import com.example.accountservice.feignclients.ProductFeignClient;
 import com.example.accountservice.repository.AccountRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.Valid;
 import java.nio.channels.AlreadyConnectedException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class AccountService {
         if(CollectionUtils.isEmpty(accounts)) throw new AccountNotFoundException("Cannot find any account");
         return accountRepository.findAll();
     }
-    public ResponseEntity<String> createAccount(AccountDTO accountDTO){
+    public ResponseEntity<String> createAccount(@Valid AccountDTO accountDTO){
         Account account = modelMapper.map(accountDTO,Account.class);
         accountRepository.save(account);
         return ResponseEntity.ok("Account create successfully");

@@ -1,6 +1,8 @@
 package com.rmit.authservice.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.rmit.authservice.dto.AccountDTO;
+import com.rmit.authservice.dto.ResponseDTO;
 import com.rmit.authservice.entity.UserCredential;
 import com.rmit.authservice.service.AuthService;
 import jakarta.validation.Valid;
@@ -25,10 +27,9 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
-    public ResponseEntity<String> addNewUser(@Valid @RequestBody AccountDTO accountDTO) {
+    public ResponseEntity<ResponseDTO> addNewUser(@Valid @RequestBody AccountDTO accountDTO) {
         return authService.saveUser(accountDTO);
     }
-
     @PostMapping("/login")
     public String getToken(@RequestBody AccountDTO userCredential) {
         Authentication authenticate = authenticationManager.authenticate(
@@ -39,11 +40,9 @@ public class AuthController {
             throw new RuntimeException("User invalid");
         }
     }
-
     @GetMapping("/validateToken")
     public String validateToken(@RequestParam("token") String token) {
         authService.validateToken(token);
         return "Token is valid";
     }
-
 }

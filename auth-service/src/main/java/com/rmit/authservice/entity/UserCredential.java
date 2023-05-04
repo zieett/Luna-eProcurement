@@ -3,6 +3,8 @@ package com.rmit.authservice.entity;
 import com.rmit.authservice.enums.Roles;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,6 +23,7 @@ public class UserCredential {
     private Long id;
     private String email;
     private String password;
+    @Enumerated(EnumType.STRING)
     private Roles role;
     @ElementCollection
     private List<String> permission;
