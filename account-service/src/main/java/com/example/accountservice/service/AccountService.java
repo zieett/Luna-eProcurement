@@ -2,15 +2,18 @@ package com.example.accountservice.service;
 
 import com.example.accountservice.dto.AccountDTO;
 import com.example.accountservice.entity.Account;
+import com.example.accountservice.exception.AccountNotFoundException;
 import com.example.accountservice.feignclients.ProductFeignClient;
 import com.example.accountservice.repository.AccountRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.nio.channels.AlreadyConnectedException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -20,14 +23,13 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final ModelMapper modelMapper;
     public AccountDTO getAccount(Long id){
-        ObjectMapper objectMapper = new ObjectMapper();
-        Account account = accountRepository.findById(id).get();
-        log.info("Account: {}",account);
+        Account account = accountRepository.findById(id).orElseThrow(() -> new AccountNotFoundException("Cannot find account with id: "+ id));
         AccountDTO accountDTO = modelMapper.map(account,AccountDTO.class);
-        log.info("Accountdto: {}",accountDTO);
         return accountDTO;
     }
     public List<Account> getAccounts(){
+        List<Account> accounts = accountRepository.findAll();
+        if(CollectionUtils.isEmpty(accounts)) throw new AccountNotFoundException("Cannot find any account");
         return accountRepository.findAll();
     }
     public ResponseEntity<String> createAccount(AccountDTO accountDTO){

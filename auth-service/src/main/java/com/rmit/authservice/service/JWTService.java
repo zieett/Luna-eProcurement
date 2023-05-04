@@ -1,11 +1,14 @@
 package com.rmit.authservice.service;
 
+import com.rmit.authservice.entity.UserCredential;
+import com.rmit.authservice.repository.UserCredentialRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import javax.swing.text.html.Option;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -21,7 +24,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class JWTService {
     public static final String SECRET = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
-
+    private final UserCredentialRepository userCredentialRepository;
 
     public void validateToken(final String token) {
         Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token);
@@ -30,6 +33,9 @@ public class JWTService {
 
     public String generateToken(String userName) {
         Map<String, Object> claims = new HashMap<>();
+        UserCredential userCredential = userCredentialRepository.findByEmail(userName).orElseThrow();
+        claims.put("role",userCredential.getRole());
+        claims.put("permission",userCredential.getPermission());
         return createToken(claims, userName);
     }
 

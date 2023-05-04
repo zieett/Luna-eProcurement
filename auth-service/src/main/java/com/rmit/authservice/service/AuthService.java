@@ -2,6 +2,7 @@ package com.rmit.authservice.service;
 
 import com.rmit.authservice.dto.AccountDTO;
 import com.rmit.authservice.entity.UserCredential;
+import com.rmit.authservice.enums.Roles;
 import com.rmit.authservice.feignclients.AccountFeignClient;
 import com.rmit.authservice.repository.UserCredentialRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class AuthService {
             HttpStatusCode status = accountFeignClient.createAccount(accountDTO).getStatusCode();
             if(status == HttpStatusCode.valueOf(200)){
                 log.info("Successfully create user with email: {}",accountDTO.getEmail());
+                userCredential.setRole(Roles.ADMIN);
                 userCredentialRepository.save(userCredential);
                 return ResponseEntity.ok("Successfully create user");
             }

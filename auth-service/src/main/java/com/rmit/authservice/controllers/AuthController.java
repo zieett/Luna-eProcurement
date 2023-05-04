@@ -3,6 +3,7 @@ package com.rmit.authservice.controllers;
 import com.rmit.authservice.dto.AccountDTO;
 import com.rmit.authservice.entity.UserCredential;
 import com.rmit.authservice.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,7 +25,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
-    public ResponseEntity<String> addNewUser(@RequestBody AccountDTO accountDTO) {
+    public ResponseEntity<String> addNewUser(@Valid @RequestBody AccountDTO accountDTO) {
         return authService.saveUser(accountDTO);
     }
 
