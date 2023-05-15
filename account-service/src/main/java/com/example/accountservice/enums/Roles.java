@@ -1,4 +1,4 @@
-package com.rmit.authservice.enums;
+package com.example.accountservice.enums;
 
 public enum Roles {
     VIEWER,

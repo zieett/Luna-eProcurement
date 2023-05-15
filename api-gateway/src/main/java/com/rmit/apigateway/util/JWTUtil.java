@@ -1,17 +1,21 @@
 package com.rmit.apigateway.util;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
+import java.security.SignatureException;
 import java.util.function.Function;
 import org.springframework.stereotype.Service;
 
 @Service
 public class JWTUtil {
     public static final String SECRET = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
-    public void validateToken(final String token) {
+    public void validateToken(final String token) throws SignatureException {
         Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token);
     }
     private Key getSignKey() {

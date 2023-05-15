@@ -1,11 +1,11 @@
 package com.example.accountservice.entity;
 
-import com.example.accountservice.enums.Roles;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,15 +14,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "account")
-public class Account {
+@Table(name = "legal_entity")
+public class LegalEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
-    private String email;
-    private String username;
-//    private String phoneNumber;
-//    private String gender;
-    private Roles role;
-    private Long legalEntityId;
+    private Long id;
+    @NotNull(message = "Legal Entity name must not be null")
+    private String name;
+    @NotNull(message = "Legal Entity code must not be null")
+    private String code;
 }

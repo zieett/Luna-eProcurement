@@ -19,7 +19,7 @@ public class CustomResponseEntityException extends ResponseEntityExceptionHandle
         ErrorDetail errorDetail = new ErrorDetail(LocalDateTime.now(), ex.getMessage(),request.getDescription(false));
         return new ResponseEntity(errorDetail, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    @ExceptionHandler(AccountNotFoundException.class)
+    @ExceptionHandler({AccountNotFoundException.class,LegalEntityNotFoundExeption.class})
     public final ResponseEntity<Object> accountNotFoundException(Exception ex, WebRequest request){
         ErrorDetail errorDetail = new ErrorDetail(LocalDateTime.now(), ex.getMessage(),request.getDescription(false));
         return new ResponseEntity(errorDetail, HttpStatus.NOT_FOUND);

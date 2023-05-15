@@ -8,6 +8,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,10 +22,12 @@ public class UserCredential {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotNull
     private String email;
+    @NotNull
     private String password;
-    @Enumerated(EnumType.STRING)
-    private Roles role;
-    @ElementCollection
-    private List<String> permission;
+//    @Enumerated(EnumType.STRING)
+//    private Roles role;
+//    @ElementCollection
+//    private List<String> permission;
 }

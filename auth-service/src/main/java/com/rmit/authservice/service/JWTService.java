@@ -34,8 +34,8 @@ public class JWTService {
     public String generateToken(String userName) {
         Map<String, Object> claims = new HashMap<>();
         UserCredential userCredential = userCredentialRepository.findByEmail(userName).orElseThrow();
-        claims.put("role",userCredential.getRole());
-        claims.put("permission",userCredential.getPermission());
+//        claims.put("role",userCredential.getRole());
+//        claims.put("permission",userCredential.getPermission());
         return createToken(claims, userName);
     }
 

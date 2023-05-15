@@ -7,6 +7,16 @@ server:
 spring:
   cloud:
     gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+        - AddResponseHeader=Access-Control-Allow-Origin, *
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:3000"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
       discovery:
         locator:
           enabled: true
@@ -16,6 +26,12 @@ spring:
           uri: lb://account-service
           predicates:
             - Path=/api/account/**
+          filters:
+            - AuthenticationFilter
+        - id: account-service-legalEntity
+          uri: lb://account-service
+          predicates:
+            - Path=/api/entity/**
           filters:
             - AuthenticationFilter
         - id: account-service-accounts

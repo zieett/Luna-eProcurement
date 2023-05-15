@@ -6,6 +6,7 @@ import com.rmit.authservice.entity.UserCredential;
 import com.rmit.authservice.enums.Roles;
 import com.rmit.authservice.feignclients.AccountFeignClient;
 import com.rmit.authservice.repository.UserCredentialRepository;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,14 +38,14 @@ public class AuthService {
                 ResponseEntity<String> responseEntity = accountFeignClient.createAccount(accountDTO);
                 status = responseEntity.getStatusCode();
                 log.info("Successfully create user with email: {}", accountDTO.getEmail());
-                userCredential.setRole(Roles.ADMIN);
+//                userCredential.setRole(Roles.ADMIN);
                 userCredentialRepository.save(userCredential);
-                return ResponseEntity.ok(new ResponseDTO("Successfully create user",status.value()));
+                return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(),"Successfully create user",status.value()));
             }
             status = HttpStatus.FOUND;
-            return ResponseEntity.status(HttpStatus.FOUND).body(new ResponseDTO("This user already exist, please use another email address",status.value()));
+            return ResponseEntity.status(HttpStatus.FOUND).body(new ResponseDTO(LocalDateTime.now(),"This user already exist, please use another email address",status.value()));
         } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseDTO("Cannot create user",HttpStatus.INTERNAL_SERVER_ERROR.value()),HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ResponseDTO(LocalDateTime.now(),"Cannot create user",HttpStatus.INTERNAL_SERVER_ERROR.value()),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

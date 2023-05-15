@@ -1,7 +1,12 @@
 package com.rmit.apigateway.filter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rmit.apigateway.exception.InvalidTokenException;
 import com.rmit.apigateway.util.JWTUtil;
+import io.jsonwebtoken.ExpiredJwtException;
+import java.security.SignatureException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -11,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 @Component
+@Slf4j
 public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
 
     @Autowired
@@ -39,14 +45,16 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 try{
                     jwtUtil.validateToken(authHeader);
 //                    restTemplate.getForObject("http://auth-service/auth/validateToken?token="+authHeader,String.class);
-                     request = exchange.getRequest()
-                        .mutate()
-                        .header("userInfo",  new ObjectMapper().writeValueAsString(jwtUtil.extractAllClaims(authHeader)))
-                        .build();
+                        request = exchange.getRequest()
+                            .mutate()
+                            .header("userInfo",
+                                new ObjectMapper().writeValueAsString(jwtUtil.extractAllClaims(authHeader)))
+                            .build();
+
                 }
-                catch (Exception e){
-                    System.out.println("Invalid access...!");
-                    throw new RuntimeException("Unauthorized access to application");
+                catch (RuntimeException | SignatureException | JsonProcessingException e){
+                    log.error(e.getMessage());
+                    throw new InvalidTokenException(e.getMessage(),e.getCause());
                 }
             }
             return chain.filter(exchange.mutate().request(request).build());
