@@ -12,5 +12,5 @@ public class JoinEntityDTO {
     @NotNull(message = "Account id must not be null")
     private String accountEmail;
     @NotNull(message = "Legal Entity id must not be null")
-    private String legalEntityId;
+    private String legalEntityCode;
 }
