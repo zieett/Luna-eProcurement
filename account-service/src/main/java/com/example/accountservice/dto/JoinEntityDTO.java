@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class JoinEntityDTO {
     @NotNull(message = "Account id must not be null")
-    private String accountId;
+    private String accountEmail;
     @NotNull(message = "Legal Entity id must not be null")
     private String legalEntityId;
 }

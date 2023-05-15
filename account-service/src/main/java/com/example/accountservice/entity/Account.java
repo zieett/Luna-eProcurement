@@ -24,5 +24,5 @@ public class Account {
 //    private String phoneNumber;
 //    private String gender;
     private Roles role;
-    private Long legalEntityId;
+    private String legalEntityCode;
 }

@@ -48,9 +48,9 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public ResponseEntity<ResponseDTO> joinEntity(JoinEntityDTO joinEntityDTO) {
-        Account account = accountRepository.findById(Long.valueOf(joinEntityDTO.getAccountId())).orElseThrow(() -> new AccountNotFoundException("Cannot find account with id: "+ joinEntityDTO.getAccountId()));
+        Account account = accountRepository.findByEmail(joinEntityDTO.getAccountEmail()).orElseThrow(() -> new AccountNotFoundException("Cannot find account with email: "+ joinEntityDTO.getAccountEmail()));
         LegalEntity legalEntity = legalEntityRepository.findById(Long.valueOf(joinEntityDTO.getLegalEntityId())).orElseThrow(() -> new LegalEntityNotFoundExeption("Cannot find account with id: "+ joinEntityDTO.getLegalEntityId()));
-        account.setLegalEntityId(Long.valueOf(joinEntityDTO.getLegalEntityId()));
+        account.setLegalEntityCode(legalEntity.getCode());
         accountRepository.save(account);
         return ResponseEntity.ok(new ResponseDTO("Succesfully join an entity", HttpStatus.OK.value()));
     }
