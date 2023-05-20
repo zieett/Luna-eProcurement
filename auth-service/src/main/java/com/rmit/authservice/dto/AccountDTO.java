@@ -16,7 +16,7 @@ public class AccountDTO implements Serializable {
     private String email;
     @NotNull(message = "Password must not be null")
     private String password;
-    @NotNull(message = "Name must not be null")
+    @NotNull(message = "Username must not be null")
     private String username;
 //    @NotNull(message = "Phone number must not be null")
 //    private String phoneNumber;

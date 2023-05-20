@@ -31,19 +31,19 @@ public class JWTService {
     }
 
 
-    public String generateToken(String userName) {
+    public String generateToken(String userEmail) {
         Map<String, Object> claims = new HashMap<>();
-        UserCredential userCredential = userCredentialRepository.findByEmail(userName).orElseThrow();
-        claims.put("userEmail",userCredential.getEmail());
+        UserCredential userCredential = userCredentialRepository.findByEmail(userEmail).orElseThrow();
+        claims.put("username",userCredential.getUsername());
 //        claims.put("role",userCredential.getRole());
 //        claims.put("permission",userCredential.getPermission());
-        return createToken(claims, userName);
+        return createToken(claims, userEmail);
     }
 
-    private String createToken(Map<String, Object> claims, String userName) {
+    private String createToken(Map<String, Object> claims, String userEmail) {
         return Jwts.builder()
             .setClaims(claims)
-            .setSubject(userName)
+            .setSubject(userEmail)
             .setIssuedAt(new Date(System.currentTimeMillis()))
             .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
             .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();

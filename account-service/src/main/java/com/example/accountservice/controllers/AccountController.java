@@ -42,8 +42,8 @@ public class AccountController {
     @GetMapping("/accounts")
     public List<Account> getAccounts(@RequestHeader("userInfo") String userInfo ) throws JsonProcessingException {
         System.out.println("UserInfo: "+ userInfo);
-        JWTPayload jwtPayload = new ObjectMapper().readValue(userInfo,JWTPayload.class);
-        System.out.println("JWT paylaod: " + jwtPayload.toString());
+//        JWTPayload jwtPayload = new ObjectMapper().readValue(userInfo,JWTPayload.class);
+//        System.out.println("JWT paylaod: " + jwtPayload.toString());
         return accountService.getAccounts();
     }
     @GetMapping("/account/{account-id}/legal-entities")

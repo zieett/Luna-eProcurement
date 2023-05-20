@@ -26,6 +26,8 @@ public class UserCredential {
     private String email;
     @NotNull
     private String password;
+    @NotNull
+    private String username;
 //    @Enumerated(EnumType.STRING)
 //    private Roles role;
 //    @ElementCollection

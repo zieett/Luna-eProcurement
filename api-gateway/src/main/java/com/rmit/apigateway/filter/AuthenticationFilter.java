@@ -36,7 +36,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             if(routeValidator.isSecured.test(exchange.getRequest())){
                 //header contains token or not
                 if(!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)){
-                    throw new RuntimeException("Missing authorization header");
+                    throw new InvalidTokenException("Missing authorization header");
                 }
                 String authHeader = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
                 if(authHeader!= null && authHeader.startsWith("Bearer ")){
@@ -50,11 +50,13 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                             .header("userInfo",
                                 new ObjectMapper().writeValueAsString(jwtUtil.extractAllClaims(authHeader)))
                             .build();
-
+                }
+                catch (ExpiredJwtException e){
+                    throw new InvalidTokenException(e.getMessage(),e);
                 }
                 catch (RuntimeException | SignatureException | JsonProcessingException e){
                     log.error(e.getMessage());
-                    throw new InvalidTokenException(e.getMessage(),e.getCause());
+                    throw new InvalidTokenException(e.getMessage(),e);
                 }
             }
             return chain.filter(exchange.mutate().request(request).build());
