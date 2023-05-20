@@ -32,8 +32,11 @@ public class AccountServiceImpl implements AccountService {
     private final ModelMapper modelMapper;
     public AccountDTO getAccount(Long id){
         Account account = accountRepository.findById(id).orElseThrow(() -> new AccountNotFoundException("Cannot find account with id: "+ id));
-        AccountDTO accountDTO = modelMapper.map(account,AccountDTO.class);
-        return accountDTO;
+        return modelMapper.map(account,AccountDTO.class);
+    }
+    public AccountDTO getAccountByEmail(String email){
+        Account account = accountRepository.findByEmail(email).orElseThrow(() -> new AccountNotFoundException("Cannot find account with email: "+ email));
+        return modelMapper.map(account,AccountDTO.class);
     }
     public List<Account> getAccounts(){
         List<Account> accounts = accountRepository.findAll();

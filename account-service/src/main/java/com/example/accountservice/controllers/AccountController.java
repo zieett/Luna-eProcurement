@@ -13,7 +13,9 @@ import com.example.accountservice.service.LegalEntityService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
+
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.MediaType;
@@ -35,36 +37,48 @@ import org.springframework.web.client.RestTemplate;
 public class AccountController {
     private final AccountService accountService;
     private final LegalEntityService legalEntityService;
+
     @GetMapping("/account/{id}")
-    public AccountDTO getAccount(@PathVariable Long id){
+    public AccountDTO getAccount(@PathVariable Long id) {
         return accountService.getAccount(id);
     }
+
+    @GetMapping("/account")
+    public AccountDTO getAccount(@RequestHeader("userInfo") String userInfo) throws JsonProcessingException {
+        JWTPayload jwtPayload = new ObjectMapper().readValue(userInfo, JWTPayload.class);
+        return accountService.getAccountByEmail(jwtPayload.getSub());
+    }
+
     @GetMapping("/accounts")
-    public List<Account> getAccounts(@RequestHeader("userInfo") String userInfo ) throws JsonProcessingException {
-        System.out.println("UserInfo: "+ userInfo);
+    public List<Account> getAccounts(@RequestHeader("userInfo") String userInfo) throws JsonProcessingException {
+        System.out.println("UserInfo: " + userInfo);
 //        JWTPayload jwtPayload = new ObjectMapper().readValue(userInfo,JWTPayload.class);
 //        System.out.println("JWT paylaod: " + jwtPayload.toString());
         return accountService.getAccounts();
     }
+
     @GetMapping("/account/{account-id}/legal-entities")
-    public ResponseEntity<List<LegalEntity>> getLegalEnties(@PathVariable(name = "account-id") Long accountId){
+    public ResponseEntity<List<LegalEntity>> getLegalEnties(@PathVariable(name = "account-id") Long accountId) {
         return legalEntityService.getLegalEntitiesAccount(accountId);
     }
 
     @PostMapping("/entity/create-entity")
-    public ResponseEntity<ResponseDTO> createLegalEntity(@Valid @RequestBody LegalEntityDTO legalEntityDTO){
+    public ResponseEntity<ResponseDTO> createLegalEntity(@Valid @RequestBody LegalEntityDTO legalEntityDTO) {
         return legalEntityService.createLegalEntity(legalEntityDTO);
     }
+
     @PostMapping("/entity/join-entity")
-    public ResponseEntity<ResponseDTO> joinLegalEntity(@Valid @RequestBody JoinEntityDTO joinEntityDTO){
+    public ResponseEntity<ResponseDTO> joinLegalEntity(@Valid @RequestBody JoinEntityDTO joinEntityDTO) {
         return accountService.joinEntity(joinEntityDTO);
     }
+
     @GetMapping("/entity")
-    public ResponseEntity<ResponseDTO<LegalEntity>> getAllLegalEntity(){
+    public ResponseEntity<ResponseDTO<LegalEntity>> getAllLegalEntity() {
         return legalEntityService.getAllLegalEntity();
     }
-    @PostMapping(value = "/account",consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> createAccount(@Valid @RequestBody AccountDTO accountDTO){
+
+    @PostMapping(value = "/account", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> createAccount(@Valid @RequestBody AccountDTO accountDTO) {
         return accountService.createAccount(accountDTO);
     }
 }

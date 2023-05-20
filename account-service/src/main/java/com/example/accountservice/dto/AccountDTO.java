@@ -1,5 +1,6 @@
 package com.example.accountservice.dto;
 
+import com.example.accountservice.enums.Roles;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -16,4 +17,6 @@ public class AccountDTO implements Serializable {
     private String email;
     @NotNull(message = "Username must not be null")
     private String username;
+    private String legalEntityCode;
+    private Roles role;
 }

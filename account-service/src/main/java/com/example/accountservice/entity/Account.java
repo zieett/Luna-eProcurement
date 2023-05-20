@@ -1,11 +1,7 @@
 package com.example.accountservice.entity;
 
 import com.example.accountservice.enums.Roles;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,6 +19,7 @@ public class Account {
     private String username;
 //    private String phoneNumber;
 //    private String gender;
+    @Enumerated(EnumType.STRING)
     private Roles role;
     private String legalEntityCode;
 }

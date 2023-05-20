@@ -11,10 +11,8 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class JWTPayload {
-    private String role;
-    private List<String> permission;
     private String sub;
     private String iat;
     private String exp;
-
+    private String username;
 }

@@ -20,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 
 public interface AccountService {
     AccountDTO getAccount(Long id);
+    AccountDTO getAccountByEmail(String email);
     List<Account> getAccounts();
     ResponseEntity<String> createAccount(@Valid AccountDTO accountDTO);
 
