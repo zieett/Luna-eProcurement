@@ -79,7 +79,7 @@ public class AccountController {
     public ResponseEntity<String> createAccount(@Valid @RequestBody AccountDTO accountDTO) {
         return accountService.createAccount(accountDTO);
     }
-    @PostMapping(value = "/entity/{entityCode}/account")
+    @GetMapping(value = "/entity/{entityCode}/account")
     public ResponseEntity<ResponseDTO<AccountDTO>> getAccountInEntity(@RequestHeader("userInfo") String userInfo,@PathVariable(name = "entityCode") String entityCode){
         return legalEntityService.getAllAccountInEntity(userInfo,entityCode);
     }
