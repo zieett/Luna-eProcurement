@@ -24,5 +24,5 @@ public interface AccountService {
     List<Account> getAccounts();
     ResponseEntity<String> createAccount(@Valid AccountDTO accountDTO);
 
-    ResponseEntity<ResponseDTO> joinEntity(JoinEntityDTO joinEntityDTO);
+    ResponseEntity<ResponseDTO> joinEntity(String userInfo,JoinEntityDTO joinEntityDTO);
 }

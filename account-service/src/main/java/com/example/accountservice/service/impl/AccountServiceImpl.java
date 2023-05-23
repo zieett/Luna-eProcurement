@@ -1,19 +1,23 @@
 package com.example.accountservice.service.impl;
 
 import com.example.accountservice.dto.AccountDTO;
+import com.example.accountservice.dto.JWTPayload;
 import com.example.accountservice.dto.JoinEntityDTO;
 import com.example.accountservice.dto.ResponseDTO;
 import com.example.accountservice.entity.Account;
 import com.example.accountservice.entity.LegalEntity;
+import com.example.accountservice.enums.Roles;
 import com.example.accountservice.exception.AccountNotFoundException;
-import com.example.accountservice.exception.LegalEntityNotFoundExeption;
+import com.example.accountservice.exception.LegalEntityNotFoundException;
 import com.example.accountservice.feignclients.ProductFeignClient;
 import com.example.accountservice.repository.AccountRepository;
 import com.example.accountservice.repository.LegalEntityRepository;
 import com.example.accountservice.service.AccountService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -30,6 +34,7 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final LegalEntityRepository legalEntityRepository;
     private final ModelMapper modelMapper;
+    private final ObjectMapper objectMapper;
     public AccountDTO getAccount(Long id){
         Account account = accountRepository.findById(id).orElseThrow(() -> new AccountNotFoundException("Cannot find account with id: "+ id));
         return modelMapper.map(account,AccountDTO.class);
@@ -50,11 +55,17 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public ResponseEntity<ResponseDTO> joinEntity(JoinEntityDTO joinEntityDTO) {
-        Account account = accountRepository.findByEmail(joinEntityDTO.getAccountEmail()).orElseThrow(() -> new AccountNotFoundException("Cannot find account with email: "+ joinEntityDTO.getAccountEmail()));
-        LegalEntity legalEntity = legalEntityRepository.findByCode(joinEntityDTO.getLegalEntityCode()).orElseThrow(() -> new LegalEntityNotFoundExeption("Cannot find legal entity with code: "+ joinEntityDTO.getLegalEntityCode()));
-        account.setLegalEntityCode(legalEntity.getCode());
-        accountRepository.save(account);
-        return ResponseEntity.ok(new ResponseDTO("Succesfully join an entity", HttpStatus.OK.value()));
+    public ResponseEntity<ResponseDTO> joinEntity(String userInfo,JoinEntityDTO joinEntityDTO) {
+        try {
+            JWTPayload jwtPayload = objectMapper.readValue(userInfo, JWTPayload.class);
+            Account account = accountRepository.findByEmail(jwtPayload.getSub()).orElseThrow(() -> new AccountNotFoundException("Cannot find account with email: "+ jwtPayload.getSub()));
+            LegalEntity legalEntity = legalEntityRepository.findByCode(joinEntityDTO.getLegalEntityCode()).orElseThrow(() -> new LegalEntityNotFoundException("Cannot find legal entity with code: "+ joinEntityDTO.getLegalEntityCode()));
+            account.setLegalEntityCode(legalEntity.getCode());
+            account.setRole(Roles.MEMBERS);
+            accountRepository.save(account);
+            return ResponseEntity.ok(new ResponseDTO("Succesfully join an entity", HttpStatus.OK.value()));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

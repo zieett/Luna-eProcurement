@@ -1,5 +1,6 @@
 package com.rmit.authservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;

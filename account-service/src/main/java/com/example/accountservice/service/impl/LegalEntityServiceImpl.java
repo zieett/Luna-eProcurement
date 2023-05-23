@@ -1,12 +1,23 @@
 package com.example.accountservice.service.impl;
 
+import com.example.accountservice.dto.AccountDTO;
+import com.example.accountservice.dto.JWTPayload;
 import com.example.accountservice.dto.LegalEntityDTO;
 import com.example.accountservice.dto.ResponseDTO;
+import com.example.accountservice.entity.Account;
 import com.example.accountservice.entity.LegalEntity;
-import com.example.accountservice.exception.LegalEntityNotFoundExeption;
+import com.example.accountservice.enums.Roles;
+import com.example.accountservice.exception.AccountNotFoundException;
+import com.example.accountservice.exception.LegalEntityNotFoundException;
+import com.example.accountservice.repository.AccountRepository;
 import com.example.accountservice.repository.LegalEntityRepository;
 import com.example.accountservice.service.LegalEntityService;
+
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -21,6 +32,8 @@ import org.springframework.util.CollectionUtils;
 public class LegalEntityServiceImpl implements LegalEntityService {
     private final LegalEntityRepository legalEntityRepository;
     private final ModelMapper modelMapper;
+    private final ObjectMapper objectMapper;
+    private final AccountRepository accountRepository;
 
     @Override
     public ResponseEntity<List<LegalEntity>> getLegalEntitiesAccount(Long accountId) {
@@ -28,18 +41,46 @@ public class LegalEntityServiceImpl implements LegalEntityService {
     }
 
     @Override
-    public ResponseEntity<ResponseDTO> createLegalEntity(LegalEntityDTO legalEntityDTO) {
-        LegalEntity legalEntity = modelMapper.map(legalEntityDTO,LegalEntity.class);
-        legalEntityRepository.save(legalEntity);
-        return ResponseEntity.ok(new ResponseDTO("Sucessfully create legal entity", HttpStatus.OK.value()));
+    public ResponseEntity<ResponseDTO> createLegalEntity(String userInfo, LegalEntityDTO legalEntityDTO) {
+        try {
+            JWTPayload jwtPayload = objectMapper.readValue(userInfo, JWTPayload.class);
+            Account account = accountRepository.findByEmail(jwtPayload.getSub()).orElseThrow(() -> new AccountNotFoundException("Cannot find account with email: " + jwtPayload.getSub()));
+            LegalEntity legalEntity = modelMapper.map(legalEntityDTO, LegalEntity.class);
+            legalEntityRepository.save(legalEntity);
+            account.setLegalEntityCode(legalEntity.getCode());
+            account.setRole(Roles.MANAGER);
+            accountRepository.save(account);
+            return ResponseEntity.ok(new ResponseDTO("Successfully create and join legal entity", HttpStatus.OK.value()));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public ResponseEntity<ResponseDTO<LegalEntity>> getAllLegalEntity() {
         List<LegalEntity> legalEntityList = legalEntityRepository.findAll();
-        if(CollectionUtils.isEmpty(legalEntityList)){
-            throw new LegalEntityNotFoundExeption("Cannot find any legal entity");
+        if (CollectionUtils.isEmpty(legalEntityList)) {
+            throw new LegalEntityNotFoundException("Cannot find any legal entity");
         }
-        return ResponseEntity.ok(new ResponseDTO<>(HttpStatus.OK.value(),legalEntityList));
+        return ResponseEntity.ok(new ResponseDTO<>(HttpStatus.OK.value(), legalEntityList));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDTO<AccountDTO>> getAllAccountInEntity(String userInfo, String entityCode) {
+        try {
+            JWTPayload jwtPayload = objectMapper.readValue(userInfo, JWTPayload.class);
+            Account account = accountRepository.findByEmail(jwtPayload.getSub()).orElseThrow(() -> new AccountNotFoundException("Cannot find account with email: " + jwtPayload.getSub()));
+            if (account.getRole() != Roles.MANAGER)
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO<>("You are not permission to view all account in entity", HttpStatus.UNAUTHORIZED.value()));
+            List<Account> accounts = accountRepository.findByLegalEntityCode(entityCode);
+            if(CollectionUtils.isEmpty(accounts)){
+                throw new AccountNotFoundException("Cannot find any account in this entity: " + entityCode);
+            }
+            List<AccountDTO> accountDTOS = accounts.stream().map(a -> modelMapper.map(a,AccountDTO.class)).toList();
+            return ResponseEntity.ok(new ResponseDTO<>(HttpStatus.OK.value(), accountDTOS));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }

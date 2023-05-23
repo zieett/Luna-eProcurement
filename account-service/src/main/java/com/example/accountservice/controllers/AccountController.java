@@ -52,8 +52,6 @@ public class AccountController {
     @GetMapping("/accounts")
     public List<Account> getAccounts(@RequestHeader("userInfo") String userInfo) throws JsonProcessingException {
         System.out.println("UserInfo: " + userInfo);
-//        JWTPayload jwtPayload = new ObjectMapper().readValue(userInfo,JWTPayload.class);
-//        System.out.println("JWT paylaod: " + jwtPayload.toString());
         return accountService.getAccounts();
     }
 
@@ -63,13 +61,13 @@ public class AccountController {
     }
 
     @PostMapping("/entity/create-entity")
-    public ResponseEntity<ResponseDTO> createLegalEntity(@Valid @RequestBody LegalEntityDTO legalEntityDTO) {
-        return legalEntityService.createLegalEntity(legalEntityDTO);
+    public ResponseEntity<ResponseDTO> createLegalEntity(@RequestHeader("userInfo") String userInfo,@Valid @RequestBody LegalEntityDTO legalEntityDTO) {
+        return legalEntityService.createLegalEntity(userInfo,legalEntityDTO);
     }
 
     @PostMapping("/entity/join-entity")
-    public ResponseEntity<ResponseDTO> joinLegalEntity(@Valid @RequestBody JoinEntityDTO joinEntityDTO) {
-        return accountService.joinEntity(joinEntityDTO);
+    public ResponseEntity<ResponseDTO> joinLegalEntity(@RequestHeader("userInfo") String userInfo,@Valid @RequestBody JoinEntityDTO joinEntityDTO) {
+        return accountService.joinEntity(userInfo,joinEntityDTO);
     }
 
     @GetMapping("/entity")
@@ -80,5 +78,9 @@ public class AccountController {
     @PostMapping(value = "/account", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createAccount(@Valid @RequestBody AccountDTO accountDTO) {
         return accountService.createAccount(accountDTO);
+    }
+    @PostMapping(value = "/entity/{entityCode}/account")
+    public ResponseEntity<ResponseDTO<AccountDTO>> getAccountInEntity(@RequestHeader("userInfo") String userInfo,@PathVariable(name = "entityCode") String entityCode){
+        return legalEntityService.getAllAccountInEntity(userInfo,entityCode);
     }
 }
