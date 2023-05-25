@@ -3,6 +3,7 @@ package com.example.accountservice.service;
 import com.example.accountservice.dto.AccountDTO;
 import com.example.accountservice.dto.JoinEntityDTO;
 import com.example.accountservice.dto.ResponseDTO;
+import com.example.accountservice.dto.SetRoleDTO;
 import com.example.accountservice.entity.Account;
 import com.example.accountservice.exception.AccountNotFoundException;
 import com.example.accountservice.feignclients.ProductFeignClient;
@@ -25,4 +26,6 @@ public interface AccountService {
     ResponseEntity<String> createAccount(@Valid AccountDTO accountDTO);
 
     ResponseEntity<ResponseDTO> joinEntity(String userInfo,JoinEntityDTO joinEntityDTO);
+
+    ResponseEntity<ResponseDTO<AccountDTO>> setAccountRole(String userInfo, SetRoleDTO setRoleDTO);
 }

@@ -1,10 +1,6 @@
 package com.example.accountservice.controllers;
 
-import com.example.accountservice.dto.AccountDTO;
-import com.example.accountservice.dto.JWTPayload;
-import com.example.accountservice.dto.JoinEntityDTO;
-import com.example.accountservice.dto.LegalEntityDTO;
-import com.example.accountservice.dto.ResponseDTO;
+import com.example.accountservice.dto.*;
 import com.example.accountservice.entity.Account;
 import com.example.accountservice.entity.LegalEntity;
 import com.example.accountservice.feignclients.ProductFeignClient;
@@ -82,5 +78,9 @@ public class AccountController {
     @GetMapping(value = "/entity/{entityCode}/account")
     public ResponseEntity<ResponseDTO<AccountDTO>> getAccountInEntity(@RequestHeader("userInfo") String userInfo,@PathVariable(name = "entityCode") String entityCode){
         return legalEntityService.getAllAccountInEntity(userInfo,entityCode);
+    }
+    @PostMapping(value = "/account/set-role")
+    public ResponseEntity<ResponseDTO<AccountDTO>> setAccountRole(@RequestHeader("userInfo") String userInfo,@Valid @RequestBody SetRoleDTO setRoleDTO){
+        return accountService.setAccountRole(userInfo,setRoleDTO);
     }
 }
