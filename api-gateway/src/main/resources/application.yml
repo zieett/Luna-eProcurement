@@ -40,6 +40,18 @@ spring:
             - Path=/api/accounts
           filters:
             - AuthenticationFilter
+        - id: account-service-department
+          uri: lb://account-service
+          predicates:
+            - Path=/api/department
+          filters:
+            - AuthenticationFilter
+        - id: account-service-team
+          uri: lb://account-service
+          predicates:
+            - Path=/api/team
+          filters:
+            - AuthenticationFilter
         - id: product-service
           uri: lb://product-service
           predicates:

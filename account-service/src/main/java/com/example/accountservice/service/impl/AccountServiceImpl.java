@@ -73,7 +73,7 @@ public class AccountServiceImpl implements AccountService {
             Account account = accountRepository.findByEmail(jwtPayload.getSub()).orElseThrow(() -> new AccountNotFoundException("Cannot find account with email: "+ jwtPayload.getSub()));
             if (account.getRole() != Roles.MANAGER)
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO<>("You are not permission to view all account in entity", HttpStatus.UNAUTHORIZED.value()));
-            Account setRoleAccount = accountRepository.findByEmail(setRoleDTO.getEmail()).orElseThrow(() -> new AccountNotFoundException("Cannot find account with email: "+ jwtPayload.getSub()));
+            Account setRoleAccount = accountRepository.findByEmail(setRoleDTO.getEmail()).orElseThrow(() -> new AccountNotFoundException("Cannot find account with email: "+ setRoleDTO.getEmail()));
             setRoleAccount.setRole(setRoleDTO.getRole());
             accountRepository.save(setRoleAccount);
             return ResponseEntity.ok(new ResponseDTO("Succesfully set role for an account:  "+ setRoleAccount.getEmail(), HttpStatus.OK.value()));

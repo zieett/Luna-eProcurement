@@ -22,4 +22,6 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private Roles role;
     private String legalEntityCode;
+    private String departmentCode;
+    private String teamCode;
 }

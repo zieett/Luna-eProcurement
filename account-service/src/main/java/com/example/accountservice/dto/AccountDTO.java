@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AccountDTO implements Serializable {
+    private Long id;
     @NotNull(message = "Email must not be null")
     @Email
     private String email;
