@@ -29,7 +29,6 @@ import org.springframework.web.client.RestTemplate;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class AccountController {
     private final AccountService accountService;
     private final LegalEntityService legalEntityService;

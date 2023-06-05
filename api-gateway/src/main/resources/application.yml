@@ -43,13 +43,13 @@ spring:
         - id: account-service-department
           uri: lb://account-service
           predicates:
-            - Path=/api/department
+            - Path=/api/department/**
           filters:
             - AuthenticationFilter
         - id: account-service-team
           uri: lb://account-service
           predicates:
-            - Path=/api/team
+            - Path=/api/team/**
           filters:
             - AuthenticationFilter
         - id: product-service

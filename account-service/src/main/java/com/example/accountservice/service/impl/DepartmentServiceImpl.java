@@ -47,13 +47,13 @@ public class DepartmentServiceImpl implements DepartmentService {
         try {
             JWTPayload jwtPayload = objectMapper.readValue(userInfo, JWTPayload.class);
             Account account = accountRepository.findByEmail(jwtPayload.getSub()).orElseThrow(() -> new AccountNotFoundException("Cannot find account with email: "+ jwtPayload.getSub()));
-            if(account.getRole() != Roles.ADMINISTRATOR)
+            if(account.getRole() != Roles.MANAGER)
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO<>("You are not permission to set a department for a user", HttpStatus.UNAUTHORIZED.value()));
             Account setDepartmentAccount = accountRepository.findByEmail(departmentDTO.getEmail()).orElseThrow(() -> new AccountNotFoundException("Cannot find account with email: "+ departmentDTO.getEmail()));
             Department department = departmentRepository.findById(departmentDTO.getCode()).orElseThrow(() -> new DepartmentNotFoundException("Cannot find department with code:" + departmentDTO.getCode()));
             setDepartmentAccount.setDepartmentCode(department.getCode());
             accountRepository.save(setDepartmentAccount);
-            return ResponseEntity.ok(new ResponseDTO("Succesfully set an department for account" + departmentDTO.getEmail(), HttpStatus.OK.value()));
+            return ResponseEntity.ok(new ResponseDTO("Successfully set an department for account" + departmentDTO.getEmail(), HttpStatus.OK.value()));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
