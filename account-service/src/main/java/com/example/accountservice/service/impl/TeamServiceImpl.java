@@ -52,6 +52,8 @@ public class TeamServiceImpl implements TeamService {
         try {
             JWTPayload jwtPayload = objectMapper.readValue(userInfo, JWTPayload.class);
             Account account = accountRepository.findByEmail(jwtPayload.getSub()).orElseThrow(() -> new AccountNotFoundException("Cannot find account with email: "+ jwtPayload.getSub()));
+            if(account.getRole() != Roles.MANAGER)
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO<>("You are not permission to create a team", HttpStatus.UNAUTHORIZED.value()));
             if(teamRepository.findById(teamDTO.getCode()).isPresent()){
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDTO<>("This team code is already exist",HttpStatus.BAD_REQUEST.value()));
             }

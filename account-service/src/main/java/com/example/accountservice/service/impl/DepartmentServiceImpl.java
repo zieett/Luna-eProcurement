@@ -65,6 +65,8 @@ public class DepartmentServiceImpl implements DepartmentService {
         try {
             JWTPayload jwtPayload = objectMapper.readValue(userInfo, JWTPayload.class);
             Account account = accountRepository.findByEmail(jwtPayload.getSub()).orElseThrow(() -> new AccountNotFoundException("Cannot find account with email: "+ jwtPayload.getSub()));
+            if(account.getRole() != Roles.MANAGER)
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO<>("You are not permission to create a department", HttpStatus.UNAUTHORIZED.value()));
             if(departmentRepository.findById(departmentDTO.getCode()).isPresent()){
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDTO<>("This department code is already exist",HttpStatus.BAD_REQUEST.value()));
             }
