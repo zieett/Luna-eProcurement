@@ -15,6 +15,7 @@ import com.example.accountservice.repository.TeamRepository;
 import com.example.accountservice.service.TeamService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -41,6 +42,35 @@ public class TeamServiceImpl implements TeamService {
             setTeamAccount.setDepartmentCode(department.getCode());
             accountRepository.save(setTeamAccount);
             return ResponseEntity.ok(new ResponseDTO("Succesfully set an department for account" + teamDTO.getEmail(), HttpStatus.OK.value()));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public ResponseEntity<ResponseDTO<Team>> createTeam(String userInfo, TeamDTO teamDTO) {
+        try {
+            JWTPayload jwtPayload = objectMapper.readValue(userInfo, JWTPayload.class);
+            Account account = accountRepository.findByEmail(jwtPayload.getSub()).orElseThrow(() -> new AccountNotFoundException("Cannot find account with email: "+ jwtPayload.getSub()));
+            if(teamRepository.findById(teamDTO.getCode()).isPresent()){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDTO<>("This team code is already exist",HttpStatus.BAD_REQUEST.value()));
+            }
+            teamRepository.save(new Team(teamDTO.getCode(),teamDTO.getName(),account.getDepartmentCode()));
+            return ResponseEntity.ok(new ResponseDTO("Successfully create a team " + teamDTO.getCode(), HttpStatus.OK.value()));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public ResponseEntity<ResponseDTO<Team>> getAllTeamInDepartment(String userInfo) {
+        try {
+            JWTPayload jwtPayload = objectMapper.readValue(userInfo, JWTPayload.class);
+            Account account = accountRepository.findByEmail(jwtPayload.getSub()).orElseThrow(() -> new AccountNotFoundException("Cannot find account with email: "+ jwtPayload.getSub()));
+            if(account.getRole() != Roles.MANAGER)
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO<>("You are not permission to view all team", HttpStatus.UNAUTHORIZED.value()));
+            List<Team> teams = teamRepository.findAllByDepartmentCode(account.getDepartmentCode());
+            return ResponseEntity.ok(new ResponseDTO(HttpStatus.OK.value(),teams));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

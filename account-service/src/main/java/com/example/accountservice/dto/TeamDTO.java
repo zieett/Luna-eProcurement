@@ -11,7 +11,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TeamDTO {
-    private String email;
     @NotNull(message = "Code must not be null")
     private String code;
+    private String name;
+    private String email;
+
+
 }

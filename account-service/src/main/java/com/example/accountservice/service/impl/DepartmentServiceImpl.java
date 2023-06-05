@@ -15,6 +15,7 @@ import com.example.accountservice.repository.DepartmentRepository;
 import com.example.accountservice.service.DepartmentService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -54,6 +55,35 @@ public class DepartmentServiceImpl implements DepartmentService {
             setDepartmentAccount.setDepartmentCode(department.getCode());
             accountRepository.save(setDepartmentAccount);
             return ResponseEntity.ok(new ResponseDTO("Successfully set an department for account" + departmentDTO.getEmail(), HttpStatus.OK.value()));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public ResponseEntity<ResponseDTO<Department>> createDepartment(String userInfo, DepartmentDTO departmentDTO) {
+        try {
+            JWTPayload jwtPayload = objectMapper.readValue(userInfo, JWTPayload.class);
+            Account account = accountRepository.findByEmail(jwtPayload.getSub()).orElseThrow(() -> new AccountNotFoundException("Cannot find account with email: "+ jwtPayload.getSub()));
+            if(departmentRepository.findById(departmentDTO.getCode()).isPresent()){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDTO<>("This department code is already exist",HttpStatus.BAD_REQUEST.value()));
+            }
+            departmentRepository.save(new Department(departmentDTO.getCode(),departmentDTO.getName(),account.getLegalEntityCode()));
+            return ResponseEntity.ok(new ResponseDTO("Successfully create a department" + departmentDTO.getCode(), HttpStatus.OK.value()));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public ResponseEntity<ResponseDTO<Department>> getAllDepartmentInLegalEntity(String userInfo) {
+        try {
+            JWTPayload jwtPayload = objectMapper.readValue(userInfo, JWTPayload.class);
+            Account account = accountRepository.findByEmail(jwtPayload.getSub()).orElseThrow(() -> new AccountNotFoundException("Cannot find account with email: "+ jwtPayload.getSub()));
+            if(account.getRole() != Roles.MANAGER)
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDTO<>("You are not permission to view all department", HttpStatus.UNAUTHORIZED.value()));
+            List<Department> departmentList = departmentRepository.getDepartmentByLegalEntityCode(account.getLegalEntityCode());
+            return ResponseEntity.ok(new ResponseDTO(HttpStatus.OK.value(),departmentList));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

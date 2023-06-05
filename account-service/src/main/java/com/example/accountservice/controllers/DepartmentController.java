@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -28,5 +29,13 @@ public class DepartmentController {
     @PostMapping(value = "/department/join-department")
     public ResponseEntity<ResponseDTO<Department>> joinDepartment(@RequestHeader("userInfo") String userInfo,@Valid @RequestBody DepartmentDTO departmentDTO) {
         return departmentService.joinDepartment(userInfo,departmentDTO);
+    }
+    @PostMapping(value = "/department")
+    public ResponseEntity<ResponseDTO<Department>> createDepartment(@RequestHeader("userInfo") String userInfo,@Valid @RequestBody DepartmentDTO departmentDTO) {
+        return departmentService.createDepartment(userInfo,departmentDTO);
+    }
+    @GetMapping(value = "/department")
+    public ResponseEntity<ResponseDTO<Department>> getAllDepartmentInLegalEntity(@RequestHeader("userInfo") String userInfo) {
+        return departmentService.getAllDepartmentInLegalEntity(userInfo);
     }
 }

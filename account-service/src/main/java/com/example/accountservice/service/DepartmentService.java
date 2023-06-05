@@ -8,4 +8,6 @@ import org.springframework.http.ResponseEntity;
 public interface DepartmentService {
     ResponseEntity<ResponseDTO<Department>> joinDepartment(String userInfo,DepartmentDTO departmentDTO);
     ResponseEntity<ResponseDTO<Department>> setAccountDepartment(String userInfo, DepartmentDTO departmentDTO);
+    ResponseEntity<ResponseDTO<Department>> createDepartment(String userInfo, DepartmentDTO departmentDTO);
+    ResponseEntity<ResponseDTO<Department>> getAllDepartmentInLegalEntity(String userInfo);
 }
