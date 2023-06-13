@@ -22,4 +22,6 @@ public class AccountDTO implements Serializable {
     private String username;
     private String legalEntityCode;
     private Roles role;
+    private String departmentCode;
+    private String teamCode;
 }
