@@ -4,11 +4,8 @@ import com.example.accountservice.dto.AccountDTO;
 import com.example.accountservice.dto.LegalEntityDTO;
 import com.example.accountservice.dto.ResponseDTO;
 import com.example.accountservice.entity.LegalEntity;
-import com.example.accountservice.repository.LegalEntityRepository;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 
 public interface LegalEntityService {
 
@@ -18,5 +15,5 @@ public interface LegalEntityService {
 
     ResponseEntity<ResponseDTO<LegalEntity>> getAllLegalEntity();
 
-    ResponseEntity<ResponseDTO<AccountDTO>> getAllAccountInEntity(String userInfo, String entityCode);
+    ResponseEntity<ResponseDTO<AccountDTO>> getAllAccountInEntity(String entityCode);
 }

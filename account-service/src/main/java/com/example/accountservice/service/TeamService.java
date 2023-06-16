@@ -6,9 +6,13 @@ import com.example.accountservice.entity.Team;
 import org.springframework.http.ResponseEntity;
 
 public interface TeamService {
-    ResponseEntity<ResponseDTO<Team>> joinTeam(String userInfo,TeamDTO teamDTO);
-    ResponseEntity<ResponseDTO<Team>> setAccountTeam(String userInfo, TeamDTO teamDTO);
+
+    ResponseEntity<ResponseDTO<Team>> joinTeam(String userInfo, TeamDTO teamDTO);
+
+    ResponseEntity<ResponseDTO<Team>> setAccountTeam(TeamDTO teamDTO);
+
     ResponseEntity<ResponseDTO<Team>> createTeam(String userInfo, TeamDTO teamDTO);
-    ResponseEntity<ResponseDTO<Team>> getAllTeamInDepartment(String userInfo);
+
+    ResponseEntity<ResponseDTO<Team>> getAllTeamInDepartment(TeamDTO teamDTO);
 
 }

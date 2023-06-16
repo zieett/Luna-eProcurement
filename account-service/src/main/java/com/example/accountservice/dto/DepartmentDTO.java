@@ -13,11 +13,10 @@ import lombok.ToString;
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DepartmentDTO {
+
     @NotNull(message = "Code must not be null")
     private String code;
     private String name;
-    private String email;
-
-
-
+    private String userEmail;
+    private String legalEntityCode;
 }

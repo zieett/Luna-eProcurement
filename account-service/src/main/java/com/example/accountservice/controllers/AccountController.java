@@ -1,22 +1,21 @@
 package com.example.accountservice.controllers;
 
-import com.example.accountservice.dto.*;
+import com.example.accountservice.aspect.Role;
+import com.example.accountservice.dto.AccountDTO;
+import com.example.accountservice.dto.JoinEntityDTO;
+import com.example.accountservice.dto.LegalEntityDTO;
+import com.example.accountservice.dto.ResponseDTO;
+import com.example.accountservice.dto.SetRoleDTO;
 import com.example.accountservice.entity.Account;
 import com.example.accountservice.entity.LegalEntity;
-import com.example.accountservice.feignclients.ProductFeignClient;
+import com.example.accountservice.enums.Roles;
 import com.example.accountservice.service.AccountService;
 import com.example.accountservice.service.LegalEntityService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
-
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,12 +23,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class AccountController {
+
     private final AccountService accountService;
     private final LegalEntityService legalEntityService;
 
@@ -39,14 +38,13 @@ public class AccountController {
     }
 
     @GetMapping("/account")
-    public AccountDTO getAccount(@RequestHeader("userInfo") String userInfo) throws JsonProcessingException {
-        JWTPayload jwtPayload = new ObjectMapper().readValue(userInfo, JWTPayload.class);
-        return accountService.getAccountByEmail(jwtPayload.getSub());
+    public AccountDTO getAccount(@RequestHeader("userInfo") String userInfo) {
+        return accountService.getAccountByEmail(userInfo);
     }
 
     @GetMapping("/accounts")
-    public List<Account> getAccounts(@RequestHeader("userInfo") String userInfo) throws JsonProcessingException {
-        System.out.println("UserInfo: " + userInfo);
+    @Role(Roles.MANAGER)
+    public ResponseEntity<List<Account>> getAccounts(@RequestHeader("userInfo") String userInfo) {
         return accountService.getAccounts();
     }
 
@@ -56,13 +54,15 @@ public class AccountController {
     }
 
     @PostMapping("/entity/create-entity")
-    public ResponseEntity<ResponseDTO> createLegalEntity(@RequestHeader("userInfo") String userInfo,@Valid @RequestBody LegalEntityDTO legalEntityDTO) {
-        return legalEntityService.createLegalEntity(userInfo,legalEntityDTO);
+    public ResponseEntity<ResponseDTO> createLegalEntity(@RequestHeader("userInfo") String userInfo,
+        @Valid @RequestBody LegalEntityDTO legalEntityDTO) {
+        return legalEntityService.createLegalEntity(userInfo, legalEntityDTO);
     }
 
     @PostMapping("/entity/join-entity")
-    public ResponseEntity<ResponseDTO> joinLegalEntity(@RequestHeader("userInfo") String userInfo,@Valid @RequestBody JoinEntityDTO joinEntityDTO) {
-        return accountService.joinEntity(userInfo,joinEntityDTO);
+    public ResponseEntity<ResponseDTO> joinLegalEntity(@RequestHeader("userInfo") String userInfo,
+        @Valid @RequestBody JoinEntityDTO joinEntityDTO) {
+        return accountService.joinEntity(userInfo, joinEntityDTO);
     }
 
     @GetMapping("/entity")
@@ -74,12 +74,18 @@ public class AccountController {
     public ResponseEntity<String> createAccount(@Valid @RequestBody AccountDTO accountDTO) {
         return accountService.createAccount(accountDTO);
     }
+
     @GetMapping(value = "/entity/{entityCode}/account")
-    public ResponseEntity<ResponseDTO<AccountDTO>> getAccountInEntity(@RequestHeader("userInfo") String userInfo,@PathVariable(name = "entityCode") String entityCode){
-        return legalEntityService.getAllAccountInEntity(userInfo,entityCode);
+    @Role(Roles.MANAGER)
+    public ResponseEntity<ResponseDTO<AccountDTO>> getAccountInEntity(@RequestHeader("userInfo") String userInfo,
+        @PathVariable(name = "entityCode") String entityCode) {
+        return legalEntityService.getAllAccountInEntity(entityCode);
     }
+
     @PostMapping(value = "/account/set-role")
-    public ResponseEntity<ResponseDTO<AccountDTO>> setAccountRole(@RequestHeader("userInfo") String userInfo,@Valid @RequestBody SetRoleDTO setRoleDTO){
-        return accountService.setAccountRole(userInfo,setRoleDTO);
+    @Role(Roles.MANAGER)
+    public ResponseEntity<ResponseDTO<AccountDTO>> setAccountRole(@RequestHeader("userInfo") String userInfo,
+        @Valid @RequestBody SetRoleDTO setRoleDTO) {
+        return accountService.setAccountRole(setRoleDTO);
     }
 }
