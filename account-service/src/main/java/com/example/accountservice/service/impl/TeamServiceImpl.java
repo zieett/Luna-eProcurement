@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -67,6 +68,11 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public ResponseEntity<ResponseDTO<Team>> getAllTeamInDepartment(TeamDTO teamDTO) {
         List<Team> teams = teamRepository.findAllByDepartmentCode(teamDTO.getDepartmentCode());
+        if (CollectionUtils.isEmpty(teams)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDTO<>(
+                "Cannot find any team with " + teamDTO.getDepartmentCode() + " department code",
+                HttpStatus.BAD_REQUEST.value()));
+        }
         return ResponseEntity.ok(new ResponseDTO<>(HttpStatus.OK.value(), teams));
     }
 

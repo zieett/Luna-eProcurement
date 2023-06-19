@@ -13,7 +13,7 @@ public interface AccountService {
 
     AccountDTO getAccount(Long id);
 
-    AccountDTO getAccountByEmail(String userInfo);
+    AccountDTO getAccountByEmail(String email);
 
     ResponseEntity<List<Account>> getAccounts();
 

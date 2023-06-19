@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -90,6 +91,11 @@ public class DepartmentServiceImpl implements DepartmentService {
     public ResponseEntity<ResponseDTO<Department>> getAllDepartmentInLegalEntity(DepartmentDTO departmentDTO) {
         List<Department> departmentList = departmentRepository.getDepartmentByLegalEntityCode(
             departmentDTO.getLegalEntityCode());
+        if (CollectionUtils.isEmpty(departmentList)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDTO<>(
+                "Cannot find any department with " + departmentDTO.getLegalEntityCode() + " legal entity",
+                HttpStatus.BAD_REQUEST.value()));
+        }
         return ResponseEntity.ok(new ResponseDTO<>(HttpStatus.OK.value(), departmentList));
     }
 }

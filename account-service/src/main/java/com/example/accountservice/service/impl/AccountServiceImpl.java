@@ -43,16 +43,12 @@ public class AccountServiceImpl implements AccountService {
         return modelMapper.map(account, AccountDTO.class);
     }
 
-    public AccountDTO getAccountByEmail(String userInfo) {
-        try {
-            JWTPayload jwtPayload = objectMapper.readValue(userInfo, JWTPayload.class);
-            Account account = accountRepository.findByEmail(jwtPayload.getSub())
-                .orElseThrow(
-                    () -> new AccountNotFoundException("Cannot find account with email: " + jwtPayload.getSub()));
-            return modelMapper.map(account, AccountDTO.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+    public AccountDTO getAccountByEmail(String email) {
+        Account account = accountRepository.findByEmail(email)
+            .orElseThrow(
+                () -> new AccountNotFoundException("Cannot find account with email: " + email));
+        return modelMapper.map(account, AccountDTO.class);
+
     }
 
     public ResponseEntity<List<Account>> getAccounts() {

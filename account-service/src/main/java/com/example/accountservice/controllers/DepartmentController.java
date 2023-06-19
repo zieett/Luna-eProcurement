@@ -39,7 +39,6 @@ public class DepartmentController {
     }
 
     @GetMapping(value = "/department")
-    @Role(Roles.MANAGER)
     public ResponseEntity<ResponseDTO<Department>> getAllDepartmentInLegalEntity(
         @Valid @RequestBody DepartmentDTO departmentDTO) {
         return departmentService.getAllDepartmentInLegalEntity(departmentDTO);
