@@ -1,4 +1,4 @@
-package com.rmit.product.entity;
+package com.rmit.product.entity.vendor;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,11 +13,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "product")
-public class Product {
+@Table(name = "vendor_contact")
+public class Contact {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String productName;
-    private String productPrice;
+    private String name;
+    private String phone;
+    private String position;
 }

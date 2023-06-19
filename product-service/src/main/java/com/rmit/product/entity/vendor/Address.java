@@ -1,9 +1,11 @@
-package com.rmit.product.entity;
+package com.rmit.product.entity.vendor;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,11 +15,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "product")
-public class Product {
+@Table(name = "vendor_address")
+public class Address {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String productName;
-    private String productPrice;
+    private String registeredAddress;
+    private String officeAddress;
+    @OneToOne(mappedBy = "address")
+    @JsonIgnore
+    private Vendor vendor;
 }
