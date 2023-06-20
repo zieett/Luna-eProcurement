@@ -12,8 +12,9 @@ import lombok.ToString;
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DepartmentDTO {
-    private String code;
-    private String name;
+
+    private String departmentCode;
+    private String departmentName;
     private String userEmail;
     private String legalEntityCode;
 }

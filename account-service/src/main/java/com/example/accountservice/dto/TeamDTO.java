@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TeamDTO {
 
-    private String code;
-    private String name;
+    private String teamCode;
+    private String teamName;
     private String userEmail;
     private String departmentCode;
 }

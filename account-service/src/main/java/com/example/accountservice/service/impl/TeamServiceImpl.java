@@ -36,9 +36,9 @@ public class TeamServiceImpl implements TeamService {
     public ResponseEntity<ResponseDTO<Team>> setAccountTeam(TeamDTO teamDTO) {
         Account setTeamAccount = accountRepository.findByEmail(teamDTO.getUserEmail()).orElseThrow(
             () -> new AccountNotFoundException("Cannot find account with email: " + teamDTO.getUserEmail()));
-        Team team = teamRepository.findById(teamDTO.getCode()).orElseThrow(
-            () -> new TeamNotFoundException("Cannot find team with code:" + teamDTO.getCode()));
-        setTeamAccount.setTeamCode(team.getCode());
+        Team team = teamRepository.findById(teamDTO.getTeamCode()).orElseThrow(
+            () -> new TeamNotFoundException("Cannot find team with code:" + teamDTO.getTeamCode()));
+        setTeamAccount.setTeamCode(team.getTeamCode());
         accountRepository.save(setTeamAccount);
         return ResponseEntity.ok(new ResponseDTO<>("Succesfully set an department for account" + teamDTO.getUserEmail(),
             HttpStatus.OK.value()));
@@ -46,7 +46,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public ResponseEntity<ResponseDTO<Team>> createTeam(String userInfo, TeamDTO teamDTO) {
-        Optional<Team> team = teamRepository.findById(teamDTO.getCode());
+        Optional<Team> team = teamRepository.findById(teamDTO.getTeamCode());
         if (team.isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ResponseDTO<>("This team code is already exist", HttpStatus.BAD_REQUEST.value()));
@@ -56,10 +56,10 @@ public class TeamServiceImpl implements TeamService {
 //            Account account = accountRepository.findByEmail(jwtPayload.getSub()).orElseThrow(
 //                () -> new AccountNotFoundException("Cannot find account with email: " + jwtPayload.getSub()));
             departmentRepository.findById(teamDTO.getDepartmentCode()).orElseThrow(
-                () -> new TeamNotFoundException("Cannot find team with code:" + teamDTO.getCode()));
-            teamRepository.save(new Team(teamDTO.getCode(), teamDTO.getName(), teamDTO.getDepartmentCode()));
+                () -> new TeamNotFoundException("Cannot find department with code:" + teamDTO.getDepartmentCode()));
+            teamRepository.save(new Team(teamDTO.getTeamCode(), teamDTO.getTeamName(), teamDTO.getDepartmentCode()));
             return ResponseEntity.ok(
-                new ResponseDTO<>("Successfully create a team " + teamDTO.getCode(), HttpStatus.OK.value()));
+                new ResponseDTO<>("Successfully create a team " + teamDTO.getTeamCode(), HttpStatus.OK.value()));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -79,8 +79,8 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public ResponseEntity<ResponseDTO<Team>> joinTeam(String userInfo, TeamDTO teamDTO) {
         try {
-            Team team = teamRepository.findById(teamDTO.getCode()).orElseThrow(
-                () -> new TeamNotFoundException("Cannot find team with code:" + teamDTO.getCode()));
+            Team team = teamRepository.findById(teamDTO.getTeamCode()).orElseThrow(
+                () -> new TeamNotFoundException("Cannot find team with code:" + teamDTO.getTeamCode()));
             JWTPayload jwtPayload = objectMapper.readValue(userInfo, JWTPayload.class);
             Account account = accountRepository.findByEmail(jwtPayload.getSub()).orElseThrow(
                 () -> new AccountNotFoundException("Cannot find account with email: " + jwtPayload.getSub()));
@@ -88,7 +88,7 @@ public class TeamServiceImpl implements TeamService {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     new ResponseDTO<>("This account is already in a team", HttpStatus.BAD_REQUEST.value()));
             }
-            account.setTeamCode(team.getCode());
+            account.setTeamCode(team.getTeamCode());
             accountRepository.save(account);
             return ResponseEntity.ok(new ResponseDTO<>("Succesfully join a team", HttpStatus.OK.value()));
         } catch (JsonProcessingException e) {

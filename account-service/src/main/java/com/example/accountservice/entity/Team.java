@@ -1,8 +1,6 @@
 package com.example.accountservice.entity;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -18,9 +16,9 @@ import lombok.NoArgsConstructor;
 public class Team {
     @Id
     @NotNull(message = "Department code must not be null")
-    private String code;
+    private String teamCode;
     @NotNull(message = "Team name must not be null")
-    private String name;
+    private String teamName;
     @NotNull(message = "Team must belong to one department")
     private String departmentCode;
 }

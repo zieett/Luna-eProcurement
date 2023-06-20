@@ -36,8 +36,9 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public ResponseEntity<ResponseDTO<Department>> joinDepartment(String userInfo, DepartmentDTO departmentDTO) {
         try {
-            Department department = departmentRepository.findById(departmentDTO.getCode()).orElseThrow(
-                () -> new DepartmentNotFoundException("Cannot find department with code:" + departmentDTO.getCode()));
+            Department department = departmentRepository.findById(departmentDTO.getDepartmentCode()).orElseThrow(
+                () -> new DepartmentNotFoundException(
+                    "Cannot find department with code:" + departmentDTO.getDepartmentCode()));
             JWTPayload jwtPayload = objectMapper.readValue(userInfo, JWTPayload.class);
             Account account = accountRepository.findByEmail(jwtPayload.getSub()).orElseThrow(
                 () -> new AccountNotFoundException("Cannot find account with email: " + jwtPayload.getSub()));
@@ -45,7 +46,7 @@ public class DepartmentServiceImpl implements DepartmentService {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     new ResponseDTO<>("This account is already in a department", HttpStatus.BAD_REQUEST.value()));
             }
-            account.setDepartmentCode(department.getCode());
+            account.setDepartmentCode(department.getDepartmentCode());
             accountRepository.save(account);
             return ResponseEntity.ok(new ResponseDTO<>("Succesfully join a department", HttpStatus.OK.value()));
         } catch (JsonProcessingException e) {
@@ -57,9 +58,10 @@ public class DepartmentServiceImpl implements DepartmentService {
     public ResponseEntity<ResponseDTO<Department>> setAccountDepartment(DepartmentDTO departmentDTO) {
         Account setDepartmentAccount = accountRepository.findByEmail(departmentDTO.getUserEmail()).orElseThrow(
             () -> new AccountNotFoundException("Cannot find account with email: " + departmentDTO.getUserEmail()));
-        Department department = departmentRepository.findById(departmentDTO.getCode()).orElseThrow(
-            () -> new DepartmentNotFoundException("Cannot find department with code:" + departmentDTO.getCode()));
-        setDepartmentAccount.setDepartmentCode(department.getCode());
+        Department department = departmentRepository.findById(departmentDTO.getDepartmentCode()).orElseThrow(
+            () -> new DepartmentNotFoundException(
+                "Cannot find department with code:" + departmentDTO.getDepartmentCode()));
+        setDepartmentAccount.setDepartmentCode(department.getDepartmentCode());
         accountRepository.save(setDepartmentAccount);
         return ResponseEntity.ok(
             new ResponseDTO<>("Successfully set an department for account" + departmentDTO.getUserEmail(),
@@ -69,7 +71,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public ResponseEntity<ResponseDTO<Department>> createDepartment(String userInfo, DepartmentDTO departmentDTO) {
         try {
-            Optional<Department> department = departmentRepository.findById(departmentDTO.getCode());
+            Optional<Department> department = departmentRepository.findById(departmentDTO.getDepartmentName());
             if (department.isPresent()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ResponseDTO<>("This department code is already exist", HttpStatus.BAD_REQUEST.value()));
@@ -79,9 +81,11 @@ public class DepartmentServiceImpl implements DepartmentService {
                 () -> new LegalEntityNotFoundException(
                     "Cannot find legal entity with code: " + departmentDTO.getLegalEntityCode()));
             departmentRepository.save(
-                new Department(departmentDTO.getCode(), departmentDTO.getName(), departmentDTO.getLegalEntityCode()));
+                new Department(departmentDTO.getDepartmentCode(), departmentDTO.getDepartmentName(),
+                    departmentDTO.getLegalEntityCode()));
             return ResponseEntity.ok(
-                new ResponseDTO<>("Successfully create a department" + departmentDTO.getCode(), HttpStatus.OK.value()));
+                new ResponseDTO<>("Successfully create a department" + departmentDTO.getDepartmentCode(),
+                    HttpStatus.OK.value()));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
