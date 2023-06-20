@@ -5,7 +5,10 @@ import com.rmit.product.dto.AccountDTO;
 import com.rmit.product.dto.JWTPayload;
 import com.rmit.product.enums.Permission;
 import com.rmit.product.feignclients.AccountFeignClient;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -26,8 +29,7 @@ public class RoleAspect {
     public Object role(ProceedingJoinPoint joinPoint, Auth auth) throws Throwable {
         JWTPayload jwtPayload = objectMapper.readValue(joinPoint.getArgs()[0].toString(), JWTPayload.class);
         AccountDTO account = accountFeignClient.getAccountByEmail(jwtPayload.getSub());
-        account.setPermissions(List.of(Permission.EDIT));
-        account.setPermissions(List.of(Permission.VIEW));
+        account.setPermissions(List.of(Permission.EDIT, Permission.CREATE));
         if (account.getRole() == auth.value().role() &&
             checkPermission(account.getPermissions(), auth.value()
                 .permissions())) {
@@ -38,17 +40,9 @@ public class RoleAspect {
     }
 
     public boolean checkPermission(List<Permission> permissions, Permission[] permissionsArr) {
-        return true;
-//        permissions.stream()(permission -> {
-//            for (Permission p : permissionsArr
-//            ) {
-//                if (permission == p) {
-//                    return true;
-//                }
-//
-//            }
-//            return false;
-//        });
+        Set<Permission> set1 = new HashSet<>(permissions);
+        Set<Permission> set2 = new HashSet<>(Arrays.stream(permissionsArr).toList());
+        set1.retainAll(set2);
+        return !set1.isEmpty();
     }
-
 }

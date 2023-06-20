@@ -30,7 +30,7 @@ public class VendorController {
     }
 
     @GetMapping("/vendor")
-    @Auth(value = @Role(role = Roles.MANAGER, permissions = {Permission.EDIT}))
+    @Auth(value = @Role(role = Roles.MANAGER, permissions = {Permission.CREATE}))
     public ResponseEntity<List<Vendor>> getVendors(@RequestHeader String userInfo) {
         return vendorService.getVendors();
     }

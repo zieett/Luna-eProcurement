@@ -95,4 +95,16 @@ public class AccountServiceImpl implements AccountService {
             new ResponseDTO<>("Succesfully set role for an account:  " + setRoleAccount.getEmail(),
                 HttpStatus.OK.value()));
     }
+
+    @Override
+    public AccountDTO getAccountByUserInfo(String userInfo) {
+        try {
+            JWTPayload jwtPayload = objectMapper.readValue(userInfo, JWTPayload.class);
+            Account account = accountRepository.findByEmail(jwtPayload.getSub()).orElseThrow(
+                () -> new AccountNotFoundException("Cannot find account with email: " + jwtPayload.getSub()));
+            return objectMapper.convertValue(account, AccountDTO.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

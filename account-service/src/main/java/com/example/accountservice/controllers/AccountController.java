@@ -32,18 +32,18 @@ public class AccountController {
     private final AccountService accountService;
     private final LegalEntityService legalEntityService;
 
-//    @GetMapping("/account/{id}")
+    //    @GetMapping("/account/{id}")
 //    public AccountDTO getAccount(@PathVariable Long id) {
 //        return accountService.getAccount(id);
 //    }
-@GetMapping("/account/{email}")
-public AccountDTO getAccountByEmail(@PathVariable String email) {
-    return accountService.getAccountByEmail(email);
-}
+    @GetMapping("/account/{email}")
+    public AccountDTO getAccountByEmail(@PathVariable String email) {
+        return accountService.getAccountByEmail(email);
+    }
 
     @GetMapping("/account")
     public AccountDTO getAccount(@RequestHeader("userInfo") String userInfo) {
-        return accountService.getAccountByEmail(userInfo);
+        return accountService.getAccountByUserInfo(userInfo);
     }
 
     @GetMapping("/accounts")
