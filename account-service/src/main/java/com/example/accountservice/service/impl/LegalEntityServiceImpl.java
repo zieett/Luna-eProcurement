@@ -1,11 +1,16 @@
 package com.example.accountservice.service.impl;
 
 import com.example.accountservice.dto.AccountDTO;
+import com.example.accountservice.dto.DepartmentInfoDTO;
 import com.example.accountservice.dto.JWTPayload;
 import com.example.accountservice.dto.LegalEntityDTO;
+import com.example.accountservice.dto.LegalEntityInfoDTO;
 import com.example.accountservice.dto.ResponseDTO;
+import com.example.accountservice.dto.TeamInfo;
 import com.example.accountservice.entity.Account;
+import com.example.accountservice.entity.Department;
 import com.example.accountservice.entity.LegalEntity;
+import com.example.accountservice.entity.Team;
 import com.example.accountservice.enums.Roles;
 import com.example.accountservice.exception.AccountNotFoundException;
 import com.example.accountservice.exception.DepartmentNotFoundException;
@@ -91,5 +96,26 @@ public class LegalEntityServiceImpl implements LegalEntityService {
             return accountDTO;
         }).toList();
         return ResponseEntity.ok(new ResponseDTO<>(HttpStatus.OK.value(), accountDTOS));
+    }
+
+    @Override
+    public ResponseEntity<ResponseDTO<LegalEntityInfoDTO>> findLegalEntityInfo(String entityCode) {
+        LegalEntity legalEntity = legalEntityRepository.findByCode(entityCode)
+            .orElseThrow(() -> new LegalEntityNotFoundException("Cannot find legal entity with code: " + entityCode));
+        LegalEntityInfoDTO legalEntityInfoDTO = modelMapper.map(legalEntity, LegalEntityInfoDTO.class);
+        List<Department> departments = departmentRepository.getDepartmentByLegalEntityCode(
+            legalEntityInfoDTO.getCode());
+        List<DepartmentInfoDTO> departmentInfoDTOS = departments.stream()
+            .map(department -> modelMapper.map(department, DepartmentInfoDTO.class)).toList();
+        departmentInfoDTOS.stream().forEach(departmentInfoDTO -> {
+            departmentInfoDTO.setTeams(getTeamInfo(departmentInfoDTO.getDepartmentCode()));
+        });
+        legalEntityInfoDTO.setDepartments(departmentInfoDTOS);
+        return ResponseEntity.ok(new ResponseDTO<>(HttpStatus.OK.value(), List.of(legalEntityInfoDTO)));
+    }
+
+    public List<TeamInfo> getTeamInfo(String departmentCode) {
+        List<Team> teams = teamRepository.findAllByDepartmentCode(departmentCode);
+        return teams.stream().map(team -> modelMapper.map(team, TeamInfo.class)).toList();
     }
 }
