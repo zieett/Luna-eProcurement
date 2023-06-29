@@ -41,7 +41,7 @@ public class DepartmentController {
 
     @DeleteMapping(value = "/department/{departmentCode}")
     @Auth(role = Roles.MANAGER)
-    public ResponseEntity<String> deleteDepartment(@PathVariable String departmentCode) {
+    public ResponseEntity<String> deleteDepartment(@RequestHeader("userInfo") String userInfo, @PathVariable String departmentCode) {
         return departmentService.deleteDepartment(departmentCode);
     }
 }

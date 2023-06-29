@@ -98,7 +98,10 @@ public class TeamServiceImpl implements TeamService {
                     () -> new AccountNotFoundException("Cannot find account with email: " + jwtPayload.getSub()));
             if (account.getTeamCode() != null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new ResponseDTO<>("This account is already in a team", HttpStatus.BAD_REQUEST.value()));
+                        new ResponseDTO<>("This account is already in a team", HttpStatus.BAD_REQUEST.value()));
+            }
+            if (account.getDepartmentCode() == null) {
+                account.setDepartmentCode(team.getDepartmentCode());
             }
             account.setTeamCode(team.getTeamCode());
             accountRepository.save(account);

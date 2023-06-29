@@ -42,7 +42,7 @@ public class TeamController {
 
     @DeleteMapping(value = "/team/{teamCode}")
     @Auth(role = Roles.MANAGER)
-    public ResponseEntity<String> deleteTeam(@PathVariable String teamCode) {
+    public ResponseEntity<String> deleteTeam(@RequestHeader("userInfo") String userInfo, @PathVariable String teamCode) {
         return teamService.deleteTeam(teamCode);
     }
 }

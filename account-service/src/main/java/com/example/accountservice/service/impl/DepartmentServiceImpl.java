@@ -75,7 +75,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public ResponseEntity<ResponseDTO<Department>> createDepartment(String userInfo, DepartmentDTO departmentDTO) {
         try {
-            Optional<Department> department = departmentRepository.findById(departmentDTO.getDepartmentName());
+            Optional<Department> department = departmentRepository.findById(departmentDTO.getDepartmentCode());
             if (department.isPresent()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body(new ResponseDTO<>("This department code is already exist", HttpStatus.BAD_REQUEST.value()));
