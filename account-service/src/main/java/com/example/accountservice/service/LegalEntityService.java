@@ -5,8 +5,9 @@ import com.example.accountservice.dto.LegalEntityDTO;
 import com.example.accountservice.dto.LegalEntityInfoDTO;
 import com.example.accountservice.dto.ResponseDTO;
 import com.example.accountservice.entity.LegalEntity;
-import java.util.List;
 import org.springframework.http.ResponseEntity;
+
+import java.util.List;
 
 public interface LegalEntityService {
 
@@ -19,4 +20,6 @@ public interface LegalEntityService {
     ResponseEntity<ResponseDTO<AccountDTO>> getAllAccountInEntity(String entityCode);
 
     ResponseEntity<ResponseDTO<LegalEntityInfoDTO>> findLegalEntityInfo(String entityCode);
+
+    ResponseEntity<String> deleteEntity(String entityCode);
 }

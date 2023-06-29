@@ -2,7 +2,7 @@ package com.example.accountservice.enums;
 
 public enum Roles {
     VIEWER,
-    MEMBERS,
+    MEMBER,
     SUPERVISOR,
     MANAGER,
     ADMINISTRATOR

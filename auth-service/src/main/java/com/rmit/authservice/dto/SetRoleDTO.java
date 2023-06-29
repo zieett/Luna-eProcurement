@@ -1,9 +1,7 @@
-package com.example.accountservice.dto;
+package com.rmit.authservice.dto;
 
-import com.example.accountservice.enums.Roles;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
+import com.rmit.authservice.enums.Roles;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,10 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SetRoleDTO {
-    @NotNull(message = "Email must not be null")
     private String userEmail;
-
-    @NotNull(message = "Role must not be null")
-    @Valid
     private Roles role;
 }

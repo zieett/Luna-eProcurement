@@ -2,7 +2,7 @@ package com.rmit.authservice.enums;
 
 public enum Roles {
     VIEWER,
-    MEMBERS,
+    MEMBER,
     SUPERVISOR,
     MANAGER,
     ADMINISTRATOR

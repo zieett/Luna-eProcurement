@@ -15,4 +15,5 @@ public interface TeamService {
 
     ResponseEntity<ResponseDTO<Team>> getAllTeamInDepartment(TeamDTO teamDTO);
 
+    ResponseEntity<String> deleteTeam(String teamCode);
 }

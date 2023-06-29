@@ -14,4 +14,6 @@ public interface DepartmentService {
     ResponseEntity<ResponseDTO<Department>> createDepartment(String userInfo, DepartmentDTO departmentDTO);
 
     ResponseEntity<ResponseDTO<Department>> getAllDepartmentInLegalEntity(DepartmentDTO departmentDTO);
+
+    ResponseEntity<String> deleteDepartment(String departmentCode);
 }

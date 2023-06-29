@@ -1,12 +1,7 @@
 package com.rmit.authservice.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.rmit.authservice.dto.AccountDTO;
-import com.rmit.authservice.dto.RefreshTokenRequest;
-import com.rmit.authservice.dto.ResponseDTO;
-import com.rmit.authservice.dto.ResponseTokenDTO;
+import com.rmit.authservice.dto.*;
 import com.rmit.authservice.entity.RefreshToken;
-import com.rmit.authservice.entity.UserCredential;
 import com.rmit.authservice.service.AuthService;
 import com.rmit.authservice.service.JWTService;
 import com.rmit.authservice.service.RefreshTokenService;
@@ -14,16 +9,7 @@ import com.rmit.authservice.service.UserCredentialService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -64,4 +50,18 @@ public class AuthController {
                         "Refresh token is not in database!"));
     }
 
+    @PostMapping("/get-auth")
+    public ResponseEntity<AuthDTO> getAuth(@RequestBody String userEmail) {
+        return authService.getAuth(userEmail);
+    }
+
+    @PostMapping("/set-role")
+    public ResponseEntity<String> setRole(@RequestBody SetRoleDTO setRoleDTO) {
+        return authService.setRole(setRoleDTO);
+    }
+
+    @DeleteMapping("/delete-account/{userEmail}")
+    public ResponseEntity<String> deleteAccount(@PathVariable String userEmail) {
+        return authService.deleteAccount(userEmail);
+    }
 }

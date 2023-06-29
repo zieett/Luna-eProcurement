@@ -10,6 +10,7 @@ import com.example.accountservice.entity.LegalEntity;
 import com.example.accountservice.enums.Roles;
 import com.example.accountservice.exception.AccountNotFoundException;
 import com.example.accountservice.exception.LegalEntityNotFoundException;
+import com.example.accountservice.feignclients.AuthFeignClient;
 import com.example.accountservice.feignclients.ProductFeignClient;
 import com.example.accountservice.repository.AccountRepository;
 import com.example.accountservice.repository.LegalEntityRepository;
@@ -31,11 +32,11 @@ import org.springframework.util.CollectionUtils;
 @Service
 public class AccountServiceImpl implements AccountService {
 
-    private final ProductFeignClient productFeignClient;
     private final AccountRepository accountRepository;
     private final LegalEntityRepository legalEntityRepository;
     private final ModelMapper modelMapper;
     private final ObjectMapper objectMapper;
+    private final AuthFeignClient authFeignClient;
 
     public AccountDTO getAccount(Long id) {
         Account account = accountRepository.findById(id)
@@ -71,12 +72,13 @@ public class AccountServiceImpl implements AccountService {
         try {
             JWTPayload jwtPayload = objectMapper.readValue(userInfo, JWTPayload.class);
             Account account = accountRepository.findByEmail(jwtPayload.getSub()).orElseThrow(
-                () -> new AccountNotFoundException("Cannot find account with email: " + jwtPayload.getSub()));
+                    () -> new AccountNotFoundException("Cannot find account with email: " + jwtPayload.getSub()));
             LegalEntity legalEntity = legalEntityRepository.findByCode(joinEntityDTO.getLegalEntityCode()).orElseThrow(
-                () -> new LegalEntityNotFoundException(
-                    "Cannot find legal entity with code: " + joinEntityDTO.getLegalEntityCode()));
+                    () -> new LegalEntityNotFoundException(
+                            "Cannot find legal entity with code: " + joinEntityDTO.getLegalEntityCode()));
             account.setLegalEntityCode(legalEntity.getCode());
-            account.setRole(Roles.MEMBERS);
+            SetRoleDTO setRoleDTO = new SetRoleDTO(jwtPayload.getSub(), Roles.MEMBER);
+            authFeignClient.setRole(setRoleDTO);
             accountRepository.save(account);
             return ResponseEntity.ok(new ResponseDTO("Succesfully join an entity", HttpStatus.OK.value()));
         } catch (JsonProcessingException e) {
@@ -85,15 +87,13 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public ResponseEntity<ResponseDTO<AccountDTO>> setAccountRole(SetRoleDTO setRoleDTO) {
-//            if (account.getRole() != Roles.MANAGER)
-        Account setRoleAccount = accountRepository.findByEmail(setRoleDTO.getEmail()).orElseThrow(
-            () -> new AccountNotFoundException("Cannot find account with email: " + setRoleDTO.getEmail()));
-        setRoleAccount.setRole(setRoleDTO.getRole());
-        accountRepository.save(setRoleAccount);
+    public ResponseEntity<ResponseDTO<String>> setAccountRole(SetRoleDTO setRoleDTO) {
+        Account setRoleAccount = accountRepository.findByEmail(setRoleDTO.getUserEmail()).orElseThrow(
+                () -> new AccountNotFoundException("Cannot find account with email: " + setRoleDTO.getUserEmail()));
+        authFeignClient.setRole(setRoleDTO);
         return ResponseEntity.ok(
-            new ResponseDTO<>("Succesfully set role for an account:  " + setRoleAccount.getEmail(),
-                HttpStatus.OK.value()));
+                new ResponseDTO<>("Succesfully set role for an account:  " + setRoleAccount.getEmail(),
+                        HttpStatus.OK.value()));
     }
 
     @Override
@@ -101,10 +101,20 @@ public class AccountServiceImpl implements AccountService {
         try {
             JWTPayload jwtPayload = objectMapper.readValue(userInfo, JWTPayload.class);
             Account account = accountRepository.findByEmail(jwtPayload.getSub()).orElseThrow(
-                () -> new AccountNotFoundException("Cannot find account with email: " + jwtPayload.getSub()));
+                    () -> new AccountNotFoundException("Cannot find account with email: " + jwtPayload.getSub()));
             return objectMapper.convertValue(account, AccountDTO.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public ResponseEntity<String> deleteAccount(String userEmail) {
+        accountRepository.findByEmail(userEmail).orElseThrow(() -> new AccountNotFoundException("Cannot find user with email: " + userEmail));
+        accountRepository.deleteAccountByEmail(userEmail);
+        authFeignClient.deleteAccount(userEmail);
+        return ResponseEntity.ok("Successfully delete a user");
+    }
+
+    ;
 }

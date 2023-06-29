@@ -13,14 +13,15 @@ import com.example.accountservice.repository.TeamRepository;
 import com.example.accountservice.service.TeamService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -70,20 +71,31 @@ public class TeamServiceImpl implements TeamService {
         List<Team> teams = teamRepository.findAllByDepartmentCode(teamDTO.getDepartmentCode());
         if (CollectionUtils.isEmpty(teams)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDTO<>(
-                "Cannot find any team with " + teamDTO.getDepartmentCode() + " department code",
-                HttpStatus.BAD_REQUEST.value()));
+                    "Cannot find any team with " + teamDTO.getDepartmentCode() + " department code",
+                    HttpStatus.BAD_REQUEST.value()));
         }
         return ResponseEntity.ok(new ResponseDTO<>(HttpStatus.OK.value(), teams));
+    }
+
+    @Override
+    public ResponseEntity<String> deleteTeam(String teamCode) {
+        Team team = teamRepository.findById(teamCode).orElseThrow(
+                () -> new TeamNotFoundException("Cannot find department with code:" + teamCode));
+        List<Account> accounts = accountRepository.findByTeamCode(teamCode);
+        accounts.forEach(account -> account.setTeamCode(null));
+        teamRepository.delete(team);
+        accountRepository.saveAll(accounts);
+        return ResponseEntity.ok("Team is deleted");
     }
 
     @Override
     public ResponseEntity<ResponseDTO<Team>> joinTeam(String userInfo, TeamDTO teamDTO) {
         try {
             Team team = teamRepository.findById(teamDTO.getTeamCode()).orElseThrow(
-                () -> new TeamNotFoundException("Cannot find team with code:" + teamDTO.getTeamCode()));
+                    () -> new TeamNotFoundException("Cannot find team with code:" + teamDTO.getTeamCode()));
             JWTPayload jwtPayload = objectMapper.readValue(userInfo, JWTPayload.class);
             Account account = accountRepository.findByEmail(jwtPayload.getSub()).orElseThrow(
-                () -> new AccountNotFoundException("Cannot find account with email: " + jwtPayload.getSub()));
+                    () -> new AccountNotFoundException("Cannot find account with email: " + jwtPayload.getSub()));
             if (account.getTeamCode() != null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                     new ResponseDTO<>("This account is already in a team", HttpStatus.BAD_REQUEST.value()));

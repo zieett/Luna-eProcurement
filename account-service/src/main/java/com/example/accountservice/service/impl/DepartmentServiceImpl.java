@@ -5,23 +5,26 @@ import com.example.accountservice.dto.JWTPayload;
 import com.example.accountservice.dto.ResponseDTO;
 import com.example.accountservice.entity.Account;
 import com.example.accountservice.entity.Department;
+import com.example.accountservice.entity.Team;
 import com.example.accountservice.exception.AccountNotFoundException;
 import com.example.accountservice.exception.DepartmentNotFoundException;
 import com.example.accountservice.exception.LegalEntityNotFoundException;
 import com.example.accountservice.repository.AccountRepository;
 import com.example.accountservice.repository.DepartmentRepository;
 import com.example.accountservice.repository.LegalEntityRepository;
+import com.example.accountservice.repository.TeamRepository;
 import com.example.accountservice.service.DepartmentService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -32,19 +35,20 @@ public class DepartmentServiceImpl implements DepartmentService {
     private final AccountRepository accountRepository;
     private final DepartmentRepository departmentRepository;
     private final LegalEntityRepository legalEntityRepository;
+    private final TeamRepository teamRepository;
 
     @Override
     public ResponseEntity<ResponseDTO<Department>> joinDepartment(String userInfo, DepartmentDTO departmentDTO) {
         try {
             Department department = departmentRepository.findById(departmentDTO.getDepartmentCode()).orElseThrow(
-                () -> new DepartmentNotFoundException(
-                    "Cannot find department with code:" + departmentDTO.getDepartmentCode()));
+                    () -> new DepartmentNotFoundException(
+                            "Cannot find department with code:" + departmentDTO.getDepartmentCode()));
             JWTPayload jwtPayload = objectMapper.readValue(userInfo, JWTPayload.class);
             Account account = accountRepository.findByEmail(jwtPayload.getSub()).orElseThrow(
-                () -> new AccountNotFoundException("Cannot find account with email: " + jwtPayload.getSub()));
+                    () -> new AccountNotFoundException("Cannot find account with email: " + jwtPayload.getSub()));
             if (account.getDepartmentCode() != null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new ResponseDTO<>("This account is already in a department", HttpStatus.BAD_REQUEST.value()));
+                        new ResponseDTO<>("This account is already in a department", HttpStatus.BAD_REQUEST.value()));
             }
             account.setDepartmentCode(department.getDepartmentCode());
             accountRepository.save(account);
@@ -57,15 +61,15 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public ResponseEntity<ResponseDTO<Department>> setAccountDepartment(DepartmentDTO departmentDTO) {
         Account setDepartmentAccount = accountRepository.findByEmail(departmentDTO.getUserEmail()).orElseThrow(
-            () -> new AccountNotFoundException("Cannot find account with email: " + departmentDTO.getUserEmail()));
+                () -> new AccountNotFoundException("Cannot find account with email: " + departmentDTO.getUserEmail()));
         Department department = departmentRepository.findById(departmentDTO.getDepartmentCode()).orElseThrow(
-            () -> new DepartmentNotFoundException(
-                "Cannot find department with code:" + departmentDTO.getDepartmentCode()));
+                () -> new DepartmentNotFoundException(
+                        "Cannot find department with code:" + departmentDTO.getDepartmentCode()));
         setDepartmentAccount.setDepartmentCode(department.getDepartmentCode());
         accountRepository.save(setDepartmentAccount);
         return ResponseEntity.ok(
-            new ResponseDTO<>("Successfully set an department for account" + departmentDTO.getUserEmail(),
-                HttpStatus.OK.value()));
+                new ResponseDTO<>("Successfully set an department for account" + departmentDTO.getUserEmail(),
+                        HttpStatus.OK.value()));
     }
 
     @Override
@@ -74,18 +78,18 @@ public class DepartmentServiceImpl implements DepartmentService {
             Optional<Department> department = departmentRepository.findById(departmentDTO.getDepartmentName());
             if (department.isPresent()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ResponseDTO<>("This department code is already exist", HttpStatus.BAD_REQUEST.value()));
+                        .body(new ResponseDTO<>("This department code is already exist", HttpStatus.BAD_REQUEST.value()));
             }
             JWTPayload jwtPayload = objectMapper.readValue(userInfo, JWTPayload.class);
             legalEntityRepository.findByCode(departmentDTO.getLegalEntityCode()).orElseThrow(
-                () -> new LegalEntityNotFoundException(
-                    "Cannot find legal entity with code: " + departmentDTO.getLegalEntityCode()));
+                    () -> new LegalEntityNotFoundException(
+                            "Cannot find legal entity with code: " + departmentDTO.getLegalEntityCode()));
             departmentRepository.save(
-                new Department(departmentDTO.getDepartmentCode(), departmentDTO.getDepartmentName(),
-                    departmentDTO.getLegalEntityCode()));
+                    new Department(departmentDTO.getDepartmentCode(), departmentDTO.getDepartmentName(),
+                            departmentDTO.getLegalEntityCode()));
             return ResponseEntity.ok(
-                new ResponseDTO<>("Successfully create a department" + departmentDTO.getDepartmentCode(),
-                    HttpStatus.OK.value()));
+                    new ResponseDTO<>("Successfully create a department" + departmentDTO.getDepartmentCode(),
+                            HttpStatus.OK.value()));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -94,12 +98,26 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public ResponseEntity<ResponseDTO<Department>> getAllDepartmentInLegalEntity(DepartmentDTO departmentDTO) {
         List<Department> departmentList = departmentRepository.getDepartmentByLegalEntityCode(
-            departmentDTO.getLegalEntityCode());
+                departmentDTO.getLegalEntityCode());
         if (CollectionUtils.isEmpty(departmentList)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDTO<>(
-                "Cannot find any department with " + departmentDTO.getLegalEntityCode() + " legal entity",
-                HttpStatus.BAD_REQUEST.value()));
+                    "Cannot find any department with " + departmentDTO.getLegalEntityCode() + " legal entity",
+                    HttpStatus.BAD_REQUEST.value()));
         }
         return ResponseEntity.ok(new ResponseDTO<>(HttpStatus.OK.value(), departmentList));
+    }
+
+    @Override
+    public ResponseEntity<String> deleteDepartment(String departmentCode) {
+        Department department = departmentRepository.findById(departmentCode).orElseThrow(
+                () -> new DepartmentNotFoundException("Cannot find department with code: " + departmentCode)
+        );
+        departmentRepository.delete(department);
+        List<Account> accounts = accountRepository.findByDepartmentCode(departmentCode);
+        accounts.forEach(account -> account.setDepartmentCode(null));
+        accountRepository.saveAll(accounts);
+        List<Team> teams = teamRepository.findAllByDepartmentCode(departmentCode);
+        teamRepository.deleteAll(teams);
+        return ResponseEntity.ok("Department is deleted");
     }
 }

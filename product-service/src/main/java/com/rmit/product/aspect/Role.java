@@ -1,7 +1,9 @@
 package com.rmit.product.aspect;
 
+
 import com.rmit.product.enums.Permission;
 import com.rmit.product.enums.Roles;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -13,5 +15,5 @@ public @interface Role {
 
     Roles role();
 
-    Permission[] permissions();
+    Permission[] permissions() default {};
 }

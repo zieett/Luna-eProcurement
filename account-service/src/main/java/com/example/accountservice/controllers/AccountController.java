@@ -1,5 +1,6 @@
 package com.example.accountservice.controllers;
 
+import com.example.accountservice.aspect.Auth;
 import com.example.accountservice.aspect.Role;
 import com.example.accountservice.dto.AccountDTO;
 import com.example.accountservice.dto.JoinEntityDTO;
@@ -12,10 +13,12 @@ import com.example.accountservice.enums.Roles;
 import com.example.accountservice.service.AccountService;
 import com.example.accountservice.service.LegalEntityService;
 import jakarta.validation.Valid;
+
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,7 +50,7 @@ public class AccountController {
     }
 
     @GetMapping("/accounts")
-    @Role(Roles.MANAGER)
+    @Auth(role = Roles.MANAGER)
     public ResponseEntity<List<Account>> getAccounts(@RequestHeader("userInfo") String userInfo) {
         return accountService.getAccounts();
     }
@@ -80,16 +83,21 @@ public class AccountController {
     }
 
     @GetMapping(value = "/entity/{entityCode}/account")
-    @Role(Roles.MANAGER)
+    @Auth(role = Roles.MANAGER)
     public ResponseEntity<ResponseDTO<AccountDTO>> getAccountInEntity(@RequestHeader("userInfo") String userInfo,
-        @PathVariable(name = "entityCode") String entityCode) {
+                                                                      @PathVariable(name = "entityCode") String entityCode) {
         return legalEntityService.getAllAccountInEntity(entityCode);
     }
 
     @PostMapping(value = "/account/set-role")
-    @Role(Roles.MANAGER)
-    public ResponseEntity<ResponseDTO<AccountDTO>> setAccountRole(@RequestHeader("userInfo") String userInfo,
-        @Valid @RequestBody SetRoleDTO setRoleDTO) {
+    @Auth(role = Roles.MANAGER)
+    public ResponseEntity<ResponseDTO<String>> setAccountRole(@RequestHeader("userInfo") String userInfo,
+                                                              @Valid @RequestBody SetRoleDTO setRoleDTO) {
         return accountService.setAccountRole(setRoleDTO);
+    }
+
+    @DeleteMapping(value = "/account/{userEmail}")
+    public ResponseEntity<String> deleteAccount(@RequestHeader("userInfo") String userInfo, @PathVariable(name = "userEmail") String userEmail) {
+        return accountService.deleteAccount(userEmail);
     }
 }

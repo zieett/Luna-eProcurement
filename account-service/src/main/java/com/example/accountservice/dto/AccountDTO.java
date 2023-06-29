@@ -1,10 +1,14 @@
 package com.example.accountservice.dto;
 
+import com.example.accountservice.enums.Permission;
 import com.example.accountservice.enums.Roles;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+
 import java.io.Serializable;
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,6 +26,7 @@ public class AccountDTO implements Serializable {
     private String username;
     private String legalEntityCode;
     private Roles role;
+    private List<Permission> permissions;
     private String departmentCode;
     private String departmentName;
     private String teamCode;

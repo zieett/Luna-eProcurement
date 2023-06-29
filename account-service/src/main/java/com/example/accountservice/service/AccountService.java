@@ -21,7 +21,9 @@ public interface AccountService {
 
     ResponseEntity<ResponseDTO> joinEntity(String userInfo, JoinEntityDTO joinEntityDTO);
 
-    ResponseEntity<ResponseDTO<AccountDTO>> setAccountRole(SetRoleDTO setRoleDTO);
+    ResponseEntity<ResponseDTO<String>> setAccountRole(SetRoleDTO setRoleDTO);
 
     AccountDTO getAccountByUserInfo(String userInfo);
+
+    ResponseEntity<String> deleteAccount(String userEmail);
 }

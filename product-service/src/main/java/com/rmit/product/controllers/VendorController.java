@@ -1,21 +1,15 @@
 package com.rmit.product.controllers;
 
 import com.rmit.product.aspect.Auth;
-import com.rmit.product.aspect.Role;
 import com.rmit.product.entity.vendor.Vendor;
-import com.rmit.product.enums.Permission;
 import com.rmit.product.enums.Roles;
 import com.rmit.product.service.VendorService;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -30,7 +24,7 @@ public class VendorController {
     }
 
     @GetMapping("/vendor")
-    @Auth(value = @Role(role = Roles.MANAGER, permissions = {Permission.CREATE}))
+    @Auth(role = Roles.MANAGER)
     public ResponseEntity<List<Vendor>> getVendors(@RequestHeader String userInfo) {
         return vendorService.getVendors();
     }

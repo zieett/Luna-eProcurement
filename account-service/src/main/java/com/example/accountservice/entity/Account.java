@@ -17,10 +17,10 @@ public class Account {
     private long id;
     private String email;
     private String username;
-//    private String phoneNumber;
+    //    private String phoneNumber;
 //    private String gender;
-    @Enumerated(EnumType.STRING)
-    private Roles role;
+//    @Enumerated(EnumType.STRING)
+//    private Roles role;
     private String legalEntityCode;
     private String departmentCode;
     private String teamCode;

@@ -1,18 +1,14 @@
 package com.rmit.authservice.entity;
 
+import com.rmit.authservice.enums.Permission;
 import com.rmit.authservice.enums.Roles;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -28,8 +24,9 @@ public class UserCredential {
     private String password;
     @NotNull
     private String username;
-//    @Enumerated(EnumType.STRING)
-//    private Roles role;
-//    @ElementCollection
-//    private List<String> permission;
+    @Enumerated(EnumType.STRING)
+    private Roles role;
+    @ElementCollection
+    @Enumerated(EnumType.STRING)
+    private List<Permission> permissions;
 }

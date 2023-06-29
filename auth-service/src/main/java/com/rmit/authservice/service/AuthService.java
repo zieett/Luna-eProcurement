@@ -1,17 +1,11 @@
 package com.rmit.authservice.service;
 
-import com.rmit.authservice.dto.AccountDTO;
-import com.rmit.authservice.dto.ResponseDTO;
-import com.rmit.authservice.dto.ResponseTokenDTO;
+import com.rmit.authservice.dto.*;
 import com.rmit.authservice.entity.RefreshToken;
 import com.rmit.authservice.entity.UserCredential;
 import com.rmit.authservice.enums.Roles;
 import com.rmit.authservice.feignclients.AccountFeignClient;
 import com.rmit.authservice.repository.UserCredentialRepository;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -24,7 +18,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -47,9 +43,9 @@ public class AuthService {
                 userCredential.setPassword(passwordEncoder.encode(userCredential.getPassword()));
                 ResponseEntity<String> responseEntity = accountFeignClient.createAccount(accountDTO);
                 status = responseEntity.getStatusCode();
-                log.info("Successfully create user with email: {}", accountDTO.getEmail());
-//                userCredential.setRole(Roles.ADMIN);
+                userCredential.setRole(Roles.MANAGER);
                 userCredentialRepository.save(userCredential);
+                log.info("Successfully create user with email: {}", accountDTO.getEmail());
                 return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), "Successfully create user", status.value()));
             }
             status = HttpStatus.FOUND;
@@ -59,13 +55,29 @@ public class AuthService {
         }
     }
 
+    public ResponseEntity<String> setRole(SetRoleDTO setRoleDTO) {
+        UserCredential userCredential = userCredentialRepository.findByEmail(setRoleDTO.getUserEmail()).orElseThrow(() -> new RuntimeException("cannot find user"));
+        userCredential.setRole(setRoleDTO.getRole());
+        userCredentialRepository.save(userCredential);
+        return ResponseEntity.ok("Set role success");
+    }
+
+    public ResponseEntity<AuthDTO> getAuth(String userEmail) {
+        UserCredential userCredential = userCredentialRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("cannot find user"));
+        AuthDTO authDTO = AuthDTO.builder()
+                .role(userCredential.getRole())
+                .permissions(userCredential.getPermissions())
+                .build();
+        return ResponseEntity.ok(authDTO);
+    }
+
     public ResponseEntity<ResponseTokenDTO> getToken(AccountDTO userCredential) {
         try {
             Authentication authenticate = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(userCredential.getEmail(), userCredential.getPassword()));
             if (authenticate.isAuthenticated()) {
                 RefreshToken refreshToken = refreshTokenService.createRefreshToken(userCredential.getEmail());
-                ResponseTokenDTO responseTokenDTO =  ResponseTokenDTO.builder()
+                ResponseTokenDTO responseTokenDTO = ResponseTokenDTO.builder()
                         .accessToken(generateToken(userCredential.getEmail()))
                         .refreshToken(refreshToken.getToken())
                         .message("Sign in successfully")
@@ -91,4 +103,8 @@ public class AuthService {
         jwtService.validateToken(token);
     }
 
+    public ResponseEntity<String> deleteAccount(String userEmail) {
+        userCredentialRepository.deleteByEmail(userEmail);
+        return ResponseEntity.ok("Successfully delete a user");
+    }
 }

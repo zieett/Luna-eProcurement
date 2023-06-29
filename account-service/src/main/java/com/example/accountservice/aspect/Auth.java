@@ -1,7 +1,7 @@
-package com.rmit.product.aspect;
+package com.example.accountservice.aspect;
 
-import com.rmit.product.enums.Permission;
-import com.rmit.product.enums.Roles;
+import com.example.accountservice.enums.Permission;
+import com.example.accountservice.enums.Roles;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

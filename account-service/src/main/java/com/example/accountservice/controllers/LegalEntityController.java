@@ -5,10 +5,7 @@ import com.example.accountservice.dto.ResponseDTO;
 import com.example.accountservice.service.LegalEntityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
@@ -20,5 +17,10 @@ public class LegalEntityController {
     @GetMapping(value = "/entity/{entityCode}/info")
     public ResponseEntity<ResponseDTO<LegalEntityInfoDTO>> getLegalEntityInfo(@PathVariable String entityCode) {
         return legalEntityService.findLegalEntityInfo(entityCode);
+    }
+
+    @DeleteMapping(value = "/entity/{entityCode}")
+    public ResponseEntity<String> deleteEntity(@PathVariable String entityCode) {
+        return legalEntityService.deleteEntity(entityCode);
     }
 }
