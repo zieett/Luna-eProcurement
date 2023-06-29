@@ -82,11 +82,11 @@ public class LegalEntityServiceImpl implements LegalEntityService {
             AccountDTO accountDTO = modelMapper.map(a, AccountDTO.class);
             if (!Objects.isNull(accountDTO.getTeamCode())) {
                 accountDTO.setTeamName(teamRepository.findById(accountDTO.getTeamCode())
-                        .orElseThrow(() -> new TeamNotFoundException("Cannot find team")).getTeamName());
+                        .orElseThrow(() -> new TeamNotFoundException("Cannot find team")).getName());
             }
             if (!Objects.isNull(accountDTO.getDepartmentCode())) {
                 accountDTO.setTeamName(departmentRepository.findById(accountDTO.getDepartmentCode())
-                        .orElseThrow(() -> new DepartmentNotFoundException("Cannot find department")).getDepartmentName());
+                        .orElseThrow(() -> new DepartmentNotFoundException("Cannot find department")).getName());
             }
             AuthDTO authDTO = authFeignClient.getAuth(a.getEmail()).getBody();
             accountDTO.setRole(authDTO.getRole());
@@ -106,7 +106,7 @@ public class LegalEntityServiceImpl implements LegalEntityService {
         List<DepartmentInfoDTO> departmentInfoDTOS = departments.stream()
                 .map(department -> modelMapper.map(department, DepartmentInfoDTO.class)).toList();
         departmentInfoDTOS.stream().forEach(departmentInfoDTO -> {
-            departmentInfoDTO.setTeams(getTeamInfo(departmentInfoDTO.getDepartmentCode()));
+            departmentInfoDTO.setTeams(getTeamInfo(departmentInfoDTO.getCode()));
         });
         legalEntityInfoDTO.setDepartments(departmentInfoDTOS);
         return ResponseEntity.ok(new ResponseDTO<>(HttpStatus.OK.value(), List.of(legalEntityInfoDTO)));
@@ -119,7 +119,7 @@ public class LegalEntityServiceImpl implements LegalEntityService {
         List<Account> accounts = accountRepository.findByLegalEntityCode(entityCode);
         List<Department> departments = departmentRepository.findByLegalEntityCode(entityCode);
         //Delete all team in departments
-        departments.forEach(department -> teamRepository.deleteAll(teamRepository.findAllByDepartmentCode(department.getDepartmentCode())));
+        departments.forEach(department -> teamRepository.deleteAll(teamRepository.findAllByDepartmentCode(department.getCode())));
         //Delete all departments
         departmentRepository.deleteAll(departments);
         //Set all account in legalentity to null

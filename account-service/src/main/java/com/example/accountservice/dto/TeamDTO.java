@@ -1,6 +1,7 @@
 package com.example.accountservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,9 +11,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TeamDTO {
-
-    private String teamCode;
-    private String teamName;
+    @JsonProperty("teamCode")
+    private String code;
+    @JsonProperty("teamName")
+    private String name;
     private String userEmail;
     private String departmentCode;
 }

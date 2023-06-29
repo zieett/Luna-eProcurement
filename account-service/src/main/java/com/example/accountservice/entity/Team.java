@@ -1,5 +1,6 @@
 package com.example.accountservice.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -16,9 +17,11 @@ import lombok.NoArgsConstructor;
 public class Team {
     @Id
     @NotNull(message = "Department code must not be null")
-    private String teamCode;
+    @Column(name = "code", updatable = false)
+    private String code;
     @NotNull(message = "Team name must not be null")
-    private String teamName;
+    @Column(name = "name")
+    private String name;
     @NotNull(message = "Team must belong to one department")
     private String departmentCode;
 }

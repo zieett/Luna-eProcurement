@@ -1,18 +1,21 @@
 package com.example.accountservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DepartmentInfoDTO {
-
-    private String departmentName;
-    private String departmentCode;
+    @JsonProperty("departmentCode")
+    private String code;
+    @JsonProperty("departmentName")
+    private String name;
     private List<TeamInfo> teams;
 }

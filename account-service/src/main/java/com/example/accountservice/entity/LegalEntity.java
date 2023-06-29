@@ -1,10 +1,6 @@
 package com.example.accountservice.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,7 +16,9 @@ public class LegalEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @NotNull(message = "Legal Entity name must not be null")
+    @Column(name = "name", updatable = false)
     private String name;
     @NotNull(message = "Legal Entity code must not be null")
+    @Column(name = "code", updatable = false)
     private String code;
 }
