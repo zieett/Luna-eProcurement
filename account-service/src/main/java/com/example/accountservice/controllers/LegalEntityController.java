@@ -1,7 +1,9 @@
 package com.example.accountservice.controllers;
 
+import com.example.accountservice.aspect.Auth;
 import com.example.accountservice.dto.LegalEntityInfoDTO;
 import com.example.accountservice.dto.ResponseDTO;
+import com.example.accountservice.enums.Roles;
 import com.example.accountservice.service.LegalEntityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +25,10 @@ public class LegalEntityController {
     public ResponseEntity<String> deleteEntity(@PathVariable String entityCode) {
         return legalEntityService.deleteEntity(entityCode);
     }
+
     @DeleteMapping(value = "/entity/{entityCode}/{userEmail}")
-    public ResponseEntity<String> deleteUserInEntity(@PathVariable String entityCode, @PathVariable String userEmail) {
-        return legalEntityService.deleteUserInEntity(entityCode,userEmail);
+    @Auth(role = Roles.MANAGER)
+    public ResponseEntity<String> deleteUserInEntity(@RequestHeader String userInfo, @PathVariable String entityCode, @PathVariable String userEmail) {
+        return legalEntityService.deleteUserInEntity(entityCode, userEmail);
     }
 }
