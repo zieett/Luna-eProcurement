@@ -23,4 +23,8 @@ public class LegalEntityController {
     public ResponseEntity<String> deleteEntity(@PathVariable String entityCode) {
         return legalEntityService.deleteEntity(entityCode);
     }
+    @DeleteMapping(value = "/entity/{entityCode}/{userEmail}")
+    public ResponseEntity<String> deleteUserInEntity(@PathVariable String entityCode, @PathVariable String userEmail) {
+        return legalEntityService.deleteUserInEntity(entityCode,userEmail);
+    }
 }

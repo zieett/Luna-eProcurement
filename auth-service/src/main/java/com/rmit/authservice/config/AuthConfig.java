@@ -34,17 +34,19 @@ public class AuthConfig  {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
     @Bean
-    public UserDetailsService userDetailsService(){
+    public UserDetailsService userDetailsService() {
         return new CustomUserDetailsService();
     }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/auth/register", "/auth/login", "/auth/validateToken", "/auth/get-auth", "/auth/set-role").permitAll()
-            .and()
-            .build();
+                .requestMatchers("/auth/register", "/auth/login", "/auth/validateToken", "/auth/get-auth", "/auth/set-role", "/auth/delete-account/**").permitAll()
+                .and()
+                .build();
     }
 
     @Bean
@@ -53,12 +55,13 @@ public class AuthConfig  {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder( );
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
+
     @Bean
-    public AuthenticationProvider authenticationProvider(){
-        DaoAuthenticationProvider authenticationProvider=new DaoAuthenticationProvider();
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailsService());
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;

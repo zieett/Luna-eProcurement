@@ -130,6 +130,17 @@ public class LegalEntityServiceImpl implements LegalEntityService {
         return ResponseEntity.ok("Legal entity deleted");
     }
 
+    @Override
+    public ResponseEntity<String> deleteUserInEntity(String entityCode, String userEmail) {
+        LegalEntity legalEntity = legalEntityRepository.findByCode(entityCode)
+                .orElseThrow(() -> new LegalEntityNotFoundException("Cannot find legal entity with code: " + entityCode));
+        Account account = accountRepository.findByEmailAndLegalEntityCode(userEmail,entityCode)
+                .orElseThrow(() -> new AccountNotFoundException("Cannot find account with email: " + userEmail+" in legal entity: "+legalEntity.getName()));
+        authFeignClient.deleteAccount(userEmail);
+        accountRepository.delete(account);
+        return ResponseEntity.ok("Account deleted");
+    }
+
     public List<TeamInfo> getTeamInfo(String departmentCode) {
         List<Team> teams = teamRepository.findAllByDepartmentCode(departmentCode);
         return teams.stream().map(team -> modelMapper.map(team, TeamInfo.class)).toList();

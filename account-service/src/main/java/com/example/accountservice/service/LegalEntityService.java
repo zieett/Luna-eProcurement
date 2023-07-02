@@ -22,4 +22,6 @@ public interface LegalEntityService {
     ResponseEntity<ResponseDTO<LegalEntityInfoDTO>> findLegalEntityInfo(String entityCode);
 
     ResponseEntity<String> deleteEntity(String entityCode);
+
+    ResponseEntity<String> deleteUserInEntity(String entityCode, String userEmail);
 }

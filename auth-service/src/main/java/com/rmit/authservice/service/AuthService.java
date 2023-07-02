@@ -43,7 +43,6 @@ public class AuthService {
                 userCredential.setPassword(passwordEncoder.encode(userCredential.getPassword()));
                 ResponseEntity<String> responseEntity = accountFeignClient.createAccount(accountDTO);
                 status = responseEntity.getStatusCode();
-                userCredential.setRole(Roles.MANAGER);
                 userCredentialRepository.save(userCredential);
                 log.info("Successfully create user with email: {}", accountDTO.getEmail());
                 return ResponseEntity.ok(new ResponseDTO(LocalDateTime.now(), "Successfully create user", status.value()));
@@ -104,7 +103,8 @@ public class AuthService {
     }
 
     public ResponseEntity<String> deleteAccount(String userEmail) {
-        userCredentialRepository.deleteByEmail(userEmail);
+        UserCredential userCredential = userCredentialRepository.findByEmail(userEmail).orElseThrow(() -> new RuntimeException("cannot find user"));
+        userCredentialRepository.delete(userCredential);
         return ResponseEntity.ok("Successfully delete a user");
     }
 }

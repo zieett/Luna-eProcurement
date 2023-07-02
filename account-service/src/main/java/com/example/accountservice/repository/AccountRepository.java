@@ -18,5 +18,6 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     List<Account> findByDepartmentCode(String departmentCode);
 
     List<Account> findByTeamCode(String teamCode);
+    Optional<Account> findByEmailAndLegalEntityCode(String userEmail,String entityCode);
 
 }
