@@ -3,6 +3,7 @@ package com.example.accountservice.controllers;
 import com.example.accountservice.aspect.Auth;
 import com.example.accountservice.dto.LegalEntityInfoDTO;
 import com.example.accountservice.dto.ResponseDTO;
+import com.example.accountservice.entity.LegalEntity;
 import com.example.accountservice.enums.Roles;
 import com.example.accountservice.service.LegalEntityService;
 import lombok.RequiredArgsConstructor;
@@ -30,5 +31,10 @@ public class LegalEntityController {
     @Auth(role = Roles.MANAGER)
     public ResponseEntity<String> deleteUserInEntity(@RequestHeader String userInfo, @PathVariable String entityCode, @PathVariable String userEmail) {
         return legalEntityService.deleteUserInEntity(entityCode, userEmail);
+    }
+
+    @GetMapping(value = "/entity/{entityCode}")
+    public LegalEntity getLegalEntityByCode(@PathVariable String entityCode) {
+        return legalEntityService.getLegalEntityByCode(entityCode);
     }
 }

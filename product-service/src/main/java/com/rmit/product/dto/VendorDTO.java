@@ -1,6 +1,9 @@
-package com.rmit.product.entity.vendor;
+package com.rmit.product.dto;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.rmit.product.entity.vendor.Address;
+import com.rmit.product.entity.vendor.Contact;
+import com.rmit.product.entity.vendor.Groups;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,16 +12,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "vendor")
-public class Vendor {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-    @NotNull
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class VendorDTO {
     private String businessName;
-    @NotNull
     private String businessNumber;
     @NotNull
     private String code;
@@ -26,13 +22,7 @@ public class Vendor {
     private String amountPayable;
     private String mediaFile;
     private String notes;
-
-    @Enumerated(EnumType.STRING)
     private Groups groups;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id", referencedColumnName = "id")
     private Address address;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "contact_id", referencedColumnName = "id")
     private Contact contact;
 }

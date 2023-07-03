@@ -5,20 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ResponseDTO<T> {
-    private String message;
-    private T data;
-
-    public ResponseDTO(String message) {
-        this.message = message;
-    }
-
-    public ResponseDTO(T data) {
-        this.data = data;
-    }
-
+public class LegalEntity implements Serializable {
+    private String name;
+    private String code;
 }

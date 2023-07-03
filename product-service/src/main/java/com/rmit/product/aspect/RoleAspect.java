@@ -33,14 +33,14 @@ public class RoleAspect {
         JWTPayload jwtPayload = objectMapper.readValue(joinPoint.getArgs()[0].toString(), JWTPayload.class);
         AuthDTO authDTO = authFeignClient.getAuth(jwtPayload.getSub()).getBody();
         if (ObjectUtils.isEmpty(authDTO)) return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new ResponseDTO<>("Permission denied", HttpStatus.UNAUTHORIZED.value()));
+                .body(new ResponseDTO<>("Permission denied"));
         if (authDTO.getRole() == auth.role() &&
                 checkPermission(authDTO.getPermissions(), auth
                         .permissions())) {
             return joinPoint.proceed();
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(new ResponseDTO<>("Permission denied", HttpStatus.UNAUTHORIZED.value()));
+                .body(new ResponseDTO<>("Permission denied"));
     }
 
     public boolean checkPermission(List<Permission> permissions, Permission[] permissionsArr) {

@@ -1,18 +1,20 @@
-package com.rmit.product.dto;
+package com.rmit.product.entity.product;
 
-import com.rmit.product.entity.product.Dimension;
-import com.rmit.product.entity.product.MediaFile;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductDTO implements Serializable {
+@Entity
+@Table(name = "product")
+public class Product {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
     private String name;
     private String description;
     private String brand;
@@ -20,10 +22,13 @@ public class ProductDTO implements Serializable {
     private String code;
     private String category;
     private String weight;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "dimension_id", referencedColumnName = "id")
     private Dimension dimension;
     private String color;
     private String material;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "media_file_id", referencedColumnName = "id")
     private MediaFile mediaFile;
-    @NotNull(message = "Legal Entity Code must not be null")
     private String legalEntityCode;
 }

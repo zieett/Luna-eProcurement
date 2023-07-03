@@ -1,12 +1,15 @@
 package com.rmit.product.service;
 
+import com.rmit.product.dto.ResponseDTO;
+import com.rmit.product.dto.VendorDTO;
 import com.rmit.product.entity.vendor.Vendor;
-import java.util.List;
 import org.springframework.http.ResponseEntity;
+
+import java.util.List;
 
 public interface VendorService {
 
-    ResponseEntity<Vendor> createVendor(Vendor vendor);
+    ResponseEntity<ResponseDTO<VendorDTO>> createVendor(VendorDTO vendorDTO);
 
     ResponseEntity<List<Vendor>> getVendors();
 }

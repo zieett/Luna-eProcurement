@@ -1,6 +1,8 @@
 package com.rmit.product.controllers;
 
 import com.rmit.product.aspect.Auth;
+import com.rmit.product.dto.ResponseDTO;
+import com.rmit.product.dto.VendorDTO;
 import com.rmit.product.entity.vendor.Vendor;
 import com.rmit.product.enums.Roles;
 import com.rmit.product.service.VendorService;
@@ -19,8 +21,8 @@ public class VendorController {
     private final VendorService vendorService;
 
     @PostMapping("/vendor")
-    public ResponseEntity<Vendor> createVendor(@Valid @RequestBody Vendor vendor) {
-        return vendorService.createVendor(vendor);
+    public ResponseEntity<ResponseDTO<VendorDTO>> createVendor(@Valid @RequestBody VendorDTO vendorDTO) {
+        return vendorService.createVendor(vendorDTO);
     }
 
     @GetMapping("/vendor")
