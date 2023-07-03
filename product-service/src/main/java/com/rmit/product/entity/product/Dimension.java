@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class Dimension {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private String id;
+    private Long id;
     private String width;
     private String height;
     private String length;

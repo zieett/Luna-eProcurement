@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class MediaFile {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private String id;
+    private Long id;
     private String productImage;
     private String videoLink;
 }
