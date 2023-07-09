@@ -1,24 +1,18 @@
 package com.example.accountservice.service.impl;
 
-import com.example.accountservice.dto.AccountDTO;
-import com.example.accountservice.dto.JWTPayload;
-import com.example.accountservice.dto.JoinEntityDTO;
-import com.example.accountservice.dto.ResponseDTO;
-import com.example.accountservice.dto.SetRoleDTO;
+import com.example.accountservice.dto.*;
 import com.example.accountservice.entity.Account;
 import com.example.accountservice.entity.LegalEntity;
 import com.example.accountservice.enums.Roles;
 import com.example.accountservice.exception.AccountNotFoundException;
 import com.example.accountservice.exception.LegalEntityNotFoundException;
 import com.example.accountservice.feignclients.AuthFeignClient;
-import com.example.accountservice.feignclients.ProductFeignClient;
 import com.example.accountservice.repository.AccountRepository;
 import com.example.accountservice.repository.LegalEntityRepository;
 import com.example.accountservice.service.AccountService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -26,6 +20,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -102,7 +99,12 @@ public class AccountServiceImpl implements AccountService {
             JWTPayload jwtPayload = objectMapper.readValue(userInfo, JWTPayload.class);
             Account account = accountRepository.findByEmail(jwtPayload.getSub()).orElseThrow(
                     () -> new AccountNotFoundException("Cannot find account with email: " + jwtPayload.getSub()));
-            return objectMapper.convertValue(account, AccountDTO.class);
+            AccountDTO accountDTO = objectMapper.convertValue(account, AccountDTO.class);
+            AuthDTO auth = authFeignClient.getAuth(jwtPayload.getSub()).getBody();
+            if (!Objects.isNull(auth)) {
+                accountDTO.setRole(auth.getRole());
+            }
+            return accountDTO;
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
