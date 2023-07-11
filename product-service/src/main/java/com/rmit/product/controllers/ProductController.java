@@ -30,12 +30,11 @@ public class ProductController {
     @GetMapping("/product/{legalEntityCode}")
     public ResponseEntity<PageResponse<List<ProductDTO>>> getProductInLegalEntityPageable(@PathVariable String legalEntityCode,
                                                                                           @RequestParam(required = false) String search,
-                                                                                          @RequestParam(defaultValue = "name") String searchBy,
                                                                                           @RequestParam(defaultValue = "1") int page,
                                                                                           @RequestParam(defaultValue = "5") int size,
-                                                                                          @RequestParam(defaultValue = "") String sortBy,
+                                                                                          @RequestParam(required = false) String sortBy,
                                                                                           @RequestParam(defaultValue = "asc") String sortDirection) {
-        return productService.getProductsInLegalEntityPageable(legalEntityCode, page - 1, size, sortBy, sortDirection, search, searchBy);
+        return productService.getProductsInLegalEntityPageable(legalEntityCode, page - 1, size, sortBy, sortDirection, search);
     }
 
     @PostMapping("/product")

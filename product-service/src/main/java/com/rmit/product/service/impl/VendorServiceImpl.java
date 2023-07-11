@@ -46,27 +46,18 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
-    public ResponseEntity<PageResponse<List<VendorDTO>>> getVendorsPageable(int page, int size, String sortBy, String sortDirection, String search, String searchBy) {
+    public ResponseEntity<PageResponse<List<VendorDTO>>> getVendorsPageable(int page, int size, String sortBy, String sortDirection, String search) {
         Sort sort;
         Pageable pageable;
         Page<Vendor> vendors;
         if (!StringUtils.isBlank(sortBy)) sort = Sort.by(Utils.getSortDirection(sortDirection), sortBy);
         else sort = null;
         if (!ObjectUtils.isEmpty(sort)) pageable = PageRequest.of(page, size, sort);
-        else pageable = PageRequest.of(page, size, Utils.getSortDirection(sortDirection), "code");
-        if (!StringUtils.isBlank(search)) vendors = getSearchVendor(search, searchBy, pageable);
+        else pageable = PageRequest.of(page, size);
+        if (!StringUtils.isBlank(search))
+            vendors = vendorRepository.searchVendorByCodeOrBusinessNameOrBusinessNumber(search, pageable);
         else vendors = vendorRepository.findAll(pageable);
         Page<VendorDTO> vendorDTOS = vendors.map(vendor -> modelMapper.map(vendor, VendorDTO.class));
         return ResponseEntity.ok(new PageResponse<>(vendorDTOS.getContent(), vendorDTOS.getPageable().getPageNumber() + 1, vendorDTOS.getSize(), vendorDTOS.getTotalPages(), vendorDTOS.getTotalElements()));
-
-    }
-
-    public Page<Vendor> getSearchVendor(String search, String searchBy, Pageable pageable) {
-        return switch (searchBy) {
-            case "code" -> vendorRepository.searchVendorByCode(search, pageable);
-            case "name" -> vendorRepository.searchVendorByBusinessName(search, pageable);
-            case "businessNumber" -> vendorRepository.searchVendorByBusinessNumber(search, pageable);
-            default -> vendorRepository.findAll(pageable);
-        };
     }
 }

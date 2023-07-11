@@ -24,4 +24,11 @@ public interface VendorRepository extends JpaRepository<Vendor, Long> {
     @Query("SELECT v FROM Vendor v WHERE " +
             "v.businessNumber LIKE CONCAT('%',:search, '%')")
     Page<Vendor> searchVendorByBusinessNumber(String search, Pageable pageable);
+
+    @Query("SELECT v FROM Vendor v WHERE " +
+            "v.code LIKE CONCAT('%',:search, '%')" +
+            "Or v.businessName LIKE CONCAT('%', :search, '%')" +
+            "Or v.businessNumber LIKE CONCAT('%', :search, '%')"
+    )
+    Page<Vendor> searchVendorByCodeOrBusinessNameOrBusinessNumber(String search, Pageable pageable);
 }

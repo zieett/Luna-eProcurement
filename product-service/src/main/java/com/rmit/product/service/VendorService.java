@@ -14,5 +14,5 @@ public interface VendorService {
 
     ResponseEntity<List<Vendor>> getVendors();
 
-    ResponseEntity<PageResponse<List<VendorDTO>>> getVendorsPageable(int page, int size, String sortBy, String sortDirection, String search, String searchBy);
+    ResponseEntity<PageResponse<List<VendorDTO>>> getVendorsPageable(int page, int size, String sortBy, String sortDirection, String search);
 }

@@ -31,11 +31,10 @@ public class VendorController {
     @GetMapping("/vendor")
     public ResponseEntity<PageResponse<List<VendorDTO>>> getVendorPageable(
             @RequestParam(required = false) String search,
-            @RequestParam(defaultValue = "businessName") String searchBy,
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "") String sortBy,
+            @RequestParam(required = false) String sortBy,
             @RequestParam(defaultValue = "asc") String sortDirection) {
-        return vendorService.getVendorsPageable(page - 1, size, sortBy, sortDirection, search, searchBy);
+        return vendorService.getVendorsPageable(page - 1, size, sortBy, sortDirection, search);
     }
 }

@@ -70,26 +70,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ResponseEntity<PageResponse<List<ProductDTO>>> getProductsInLegalEntityPageable(String legalEntityCode, int page, int size, String sortBy, String sortDirection, String search, String searchBy) {
+    public ResponseEntity<PageResponse<List<ProductDTO>>> getProductsInLegalEntityPageable(String legalEntityCode, int page, int size, String sortBy, String sortDirection, String search) {
         Sort sort;
         Pageable pageable;
         Page<Product> products;
         if (!StringUtils.isBlank(sortBy)) sort = Sort.by(Utils.getSortDirection(sortDirection), sortBy);
         else sort = null;
         if (!ObjectUtils.isEmpty(sort)) pageable = PageRequest.of(page, size, sort);
-        else pageable = PageRequest.of(page, size, Utils.getSortDirection(sortDirection), "code");
-        if (!StringUtils.isBlank(search)) products = getSearchProduct(search, searchBy, pageable);
+        else pageable = PageRequest.of(page, size);
+        if (!StringUtils.isBlank(search)) products = productRepository.searchProductByCodeOrName(search, pageable);
         else products = productRepository.findAll(pageable);
         Page<ProductDTO> productDTOS = products.map(product -> modelMapper.map(product, ProductDTO.class));
         return ResponseEntity.ok(new PageResponse<>(productDTOS.getContent(), productDTOS.getPageable().getPageNumber() + 1, productDTOS.getSize(), productDTOS.getTotalPages(), productDTOS.getTotalElements()));
-    }
-
-    public Page<Product> getSearchProduct(String search, String searchBy, Pageable pageable) {
-        return switch (searchBy) {
-            case "code" -> productRepository.searchProductByCode(search, pageable);
-            case "name" -> productRepository.searchProductByName(search, pageable);
-            default -> productRepository.findAll(pageable);
-        };
     }
 
 }
