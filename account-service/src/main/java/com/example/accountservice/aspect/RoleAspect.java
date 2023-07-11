@@ -39,7 +39,10 @@ public class RoleAspect {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ResponseDTO<>("Permission denied", HttpStatus.UNAUTHORIZED.value()));
         }
-
+        if (jwtPayload.getRole() != authDTO.getRole()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ResponseDTO<>("You need to Refresh token", HttpStatus.UNAUTHORIZED.value()));
+        }
         if (authDTO.getRole() == auth.role() &&
                 checkPermission(authDTO.getPermissions(), auth
                         .permissions())) {

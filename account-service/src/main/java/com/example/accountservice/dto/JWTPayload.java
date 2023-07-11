@@ -1,7 +1,6 @@
 package com.example.accountservice.dto;
 
-import java.util.List;
-
+import com.example.accountservice.enums.Roles;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,4 +17,5 @@ public class JWTPayload {
     private String iat;
     private String exp;
     private String username;
+    private Roles role;
 }

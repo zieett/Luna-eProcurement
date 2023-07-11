@@ -1,5 +1,6 @@
 package com.rmit.product.service;
 
+import com.rmit.product.dto.PageResponse;
 import com.rmit.product.dto.ProductDTO;
 import com.rmit.product.dto.ResponseDTO;
 import com.rmit.product.entity.product.Product;
@@ -15,4 +16,6 @@ public interface ProductService {
     ResponseEntity<String> deleteProduct(String productCode);
 
     ResponseEntity<ResponseDTO<List<ProductDTO>>> getProductsInLegalEntity(String legalEntityCode);
+
+    ResponseEntity<PageResponse<List<ProductDTO>>> getProductsInLegalEntityPageable(String legalEntityCode, int page, int size, String sortBy, String sortDirection, String search, String searchBy);
 }

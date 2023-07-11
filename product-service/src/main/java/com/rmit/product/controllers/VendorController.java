@@ -1,10 +1,8 @@
 package com.rmit.product.controllers;
 
-import com.rmit.product.aspect.Auth;
+import com.rmit.product.dto.PageResponse;
 import com.rmit.product.dto.ResponseDTO;
 import com.rmit.product.dto.VendorDTO;
-import com.rmit.product.entity.vendor.Vendor;
-import com.rmit.product.enums.Roles;
 import com.rmit.product.service.VendorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +23,19 @@ public class VendorController {
         return vendorService.createVendor(vendorDTO);
     }
 
+    //    @GetMapping("/vendor")
+//    @Auth(role = Roles.MANAGER)
+//    public ResponseEntity<List<Vendor>> getVendors(@RequestHeader String userInfo) {
+//        return vendorService.getVendors();
+//    }
     @GetMapping("/vendor")
-    @Auth(role = Roles.MANAGER)
-    public ResponseEntity<List<Vendor>> getVendors(@RequestHeader String userInfo) {
-        return vendorService.getVendors();
+    public ResponseEntity<PageResponse<List<VendorDTO>>> getVendorPageable(
+            @RequestParam(required = false) String search,
+            @RequestParam(defaultValue = "businessName") String searchBy,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
+        return vendorService.getVendorsPageable(page - 1, size, sortBy, sortDirection, search, searchBy);
     }
 }

@@ -1,5 +1,6 @@
 package com.rmit.product.controllers;
 
+import com.rmit.product.dto.PageResponse;
 import com.rmit.product.dto.ProductDTO;
 import com.rmit.product.dto.ResponseDTO;
 import com.rmit.product.entity.product.Product;
@@ -22,9 +23,19 @@ public class ProductController {
         return productService.getAllProducts();
     }
 
+    //    @GetMapping("/product/{legalEntityCode}")
+//    public ResponseEntity<ResponseDTO<List<ProductDTO>>> getProductInLegalEntity(@PathVariable String legalEntityCode) {
+//        return productService.getProductsInLegalEntity(legalEntityCode);
+//    }
     @GetMapping("/product/{legalEntityCode}")
-    public ResponseEntity<ResponseDTO<List<ProductDTO>>> getProductInLegalEntity(@PathVariable String legalEntityCode) {
-        return productService.getProductsInLegalEntity(legalEntityCode);
+    public ResponseEntity<PageResponse<List<ProductDTO>>> getProductInLegalEntityPageable(@PathVariable String legalEntityCode,
+                                                                                          @RequestParam(required = false) String search,
+                                                                                          @RequestParam(defaultValue = "name") String searchBy,
+                                                                                          @RequestParam(defaultValue = "1") int page,
+                                                                                          @RequestParam(defaultValue = "5") int size,
+                                                                                          @RequestParam(defaultValue = "") String sortBy,
+                                                                                          @RequestParam(defaultValue = "asc") String sortDirection) {
+        return productService.getProductsInLegalEntityPageable(legalEntityCode, page - 1, size, sortBy, sortDirection, search, searchBy);
     }
 
     @PostMapping("/product")
