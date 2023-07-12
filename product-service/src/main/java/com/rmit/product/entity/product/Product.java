@@ -20,6 +20,7 @@ public class Product {
     private String brand;
     @NotNull(message = "Code must not be null")
     private String code;
+    private String sku;
     private String category;
     private String weight;
     @OneToOne(cascade = CascadeType.ALL)

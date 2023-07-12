@@ -32,7 +32,7 @@ public class VendorController {
     public ResponseEntity<PageResponse<List<VendorDTO>>> getVendorPageable(
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "150") int size,
             @RequestParam(required = false) String sortBy,
             @RequestParam(defaultValue = "asc") String sortDirection) {
         return vendorService.getVendorsPageable(page - 1, size, sortBy, sortDirection, search);

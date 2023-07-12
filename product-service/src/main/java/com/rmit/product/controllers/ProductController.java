@@ -31,7 +31,7 @@ public class ProductController {
     public ResponseEntity<PageResponse<List<ProductDTO>>> getProductInLegalEntityPageable(@PathVariable String legalEntityCode,
                                                                                           @RequestParam(required = false) String search,
                                                                                           @RequestParam(defaultValue = "1") int page,
-                                                                                          @RequestParam(defaultValue = "5") int size,
+                                                                                          @RequestParam(defaultValue = "150") int size,
                                                                                           @RequestParam(required = false) String sortBy,
                                                                                           @RequestParam(defaultValue = "asc") String sortDirection) {
         return productService.getProductsInLegalEntityPageable(legalEntityCode, page - 1, size, sortBy, sortDirection, search);

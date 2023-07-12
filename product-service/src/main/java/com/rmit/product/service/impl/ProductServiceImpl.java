@@ -84,4 +84,5 @@ public class ProductServiceImpl implements ProductService {
         return ResponseEntity.ok(new PageResponse<>(productDTOS.getContent(), productDTOS.getPageable().getPageNumber() + 1, productDTOS.getSize(), productDTOS.getTotalPages(), productDTOS.getTotalElements()));
     }
 
+
 }
