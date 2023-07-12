@@ -42,8 +42,8 @@ public class ProductController {
         return productService.createProduct(productDTO);
     }
 
-    @DeleteMapping("/product/{productCode}")
-    public ResponseEntity<String> deleteProduct(@PathVariable String productCode) {
-        return productService.deleteProduct(productCode);
+    @DeleteMapping("/product/{legalEntityCode}/{productCode}")
+    public ResponseEntity<String> deleteProduct(@PathVariable String legalEntityCode, @PathVariable String productCode) {
+        return productService.deleteProduct(legalEntityCode, productCode);
     }
 }

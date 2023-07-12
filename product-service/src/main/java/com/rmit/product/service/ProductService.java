@@ -13,7 +13,7 @@ public interface ProductService {
 
     ResponseEntity<List<Product>> getAllProducts();
 
-    ResponseEntity<String> deleteProduct(String productCode);
+    ResponseEntity<String> deleteProduct(String legalEntityCode, String productCode);
 
     ResponseEntity<ResponseDTO<List<ProductDTO>>> getProductsInLegalEntity(String legalEntityCode);
 

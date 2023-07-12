@@ -14,9 +14,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VendorDTO {
+    @NotNull(message = "businessName must not be null")
     private String businessName;
+    @NotNull(message = "businessNumber must not be null")
     private String businessNumber;
-    @NotNull
+    @NotNull(message = "Code must not be null")
     private String code;
     private String totalPurchase;
     private String amountPayable;

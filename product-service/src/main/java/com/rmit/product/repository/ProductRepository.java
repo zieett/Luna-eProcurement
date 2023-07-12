@@ -16,6 +16,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     List<Product> findByLegalEntityCode(String legalEntityCode);
 
+    Page<Product> findAllByLegalEntityCode(String legalEntityCode, Pageable pageable);
+
     Optional<Product> findByCodeAndLegalEntityCode(String code, String productCode);
 
     @Query("SELECT p FROM Product p WHERE " +
@@ -27,8 +29,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> searchProductByName(String search, Pageable pageable);
 
     @Query("SELECT p FROM Product p WHERE " +
-            "p.code LIKE CONCAT('%',:search, '%')" +
-            "Or p.name LIKE CONCAT('%', :search, '%')"
+            "(p.code LIKE CONCAT('%',:search, '%')" +
+            "or p.name LIKE CONCAT('%', :search, '%')" +
+            "or p.sku LIKE CONCAT('%', :search, '%'))" +
+            "and p.legalEntityCode = :legalEntityCode"
     )
-    Page<Product> searchProductByCodeOrName(String search, Pageable pageable);
+    Page<Product> searchProductByCodeOrNameOrSku(String search, String legalEntityCode, Pageable pageable);
 }

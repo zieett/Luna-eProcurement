@@ -52,8 +52,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ResponseEntity<String> deleteProduct(String productCode) {
-        Product product = productRepository.findByCode(productCode).orElseThrow(() -> new ProductNotFoundException("Cannot find product with code: " + productCode));
+    public ResponseEntity<String> deleteProduct(String legalEntityCode, String productCode) {
+        Product product = productRepository.findByCodeAndLegalEntityCode(productCode, legalEntityCode).orElseThrow(() -> new ProductNotFoundException("Cannot find product with code: " + productCode));
+        if (ObjectUtils.isEmpty(product)) return ResponseEntity.ok("Cannot find any product to delete");
         productRepository.delete(product);
         return ResponseEntity.ok("Product deleted");
     }
@@ -71,6 +72,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseEntity<PageResponse<List<ProductDTO>>> getProductsInLegalEntityPageable(String legalEntityCode, int page, int size, String sortBy, String sortDirection, String search) {
+        LegalEntity legalEntity = accountFeignClient.getLegalEntityByCode(legalEntityCode);
+        if (ObjectUtils.isEmpty(legalEntity)) {
+            throw new LegalEntityNotFoundException("Cannot find legal entity with code: " + legalEntityCode);
+        }
         Sort sort;
         Pageable pageable;
         Page<Product> products;
@@ -78,8 +83,9 @@ public class ProductServiceImpl implements ProductService {
         else sort = null;
         if (!ObjectUtils.isEmpty(sort)) pageable = PageRequest.of(page, size, sort);
         else pageable = PageRequest.of(page, size);
-        if (!StringUtils.isBlank(search)) products = productRepository.searchProductByCodeOrName(search, pageable);
-        else products = productRepository.findAll(pageable);
+        if (!StringUtils.isBlank(search))
+            products = productRepository.searchProductByCodeOrNameOrSku(search, legalEntityCode, pageable);
+        else products = productRepository.findAllByLegalEntityCode(legalEntityCode, pageable);
         Page<ProductDTO> productDTOS = products.map(product -> modelMapper.map(product, ProductDTO.class));
         return ResponseEntity.ok(new PageResponse<>(productDTOS.getContent(), productDTOS.getPageable().getPageNumber() + 1, productDTOS.getSize(), productDTOS.getTotalPages(), productDTOS.getTotalElements()));
     }
