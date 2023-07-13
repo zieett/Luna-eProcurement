@@ -1,14 +1,16 @@
 package com.rmit.product.service.impl;
 
-import com.rmit.product.dto.LegalEntity;
-import com.rmit.product.dto.PageResponse;
-import com.rmit.product.dto.ProductDTO;
-import com.rmit.product.dto.ResponseDTO;
+import com.rmit.product.dto.*;
+import com.rmit.product.entity.ProductVendor;
 import com.rmit.product.entity.product.Product;
+import com.rmit.product.entity.vendor.Vendor;
 import com.rmit.product.exception.LegalEntityNotFoundException;
 import com.rmit.product.exception.ProductNotFoundException;
+import com.rmit.product.exception.VendorNotFoundException;
 import com.rmit.product.feignclients.AccountFeignClient;
 import com.rmit.product.repository.ProductRepository;
+import com.rmit.product.repository.ProductVendorRepository;
+import com.rmit.product.repository.VendorRepository;
 import com.rmit.product.service.ProductService;
 import com.rmit.product.ultils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +23,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +35,8 @@ public class ProductServiceImpl implements ProductService {
     private final ModelMapper modelMapper;
     private final ProductRepository productRepository;
     private final AccountFeignClient accountFeignClient;
+    private final VendorRepository vendorRepository;
+    private final ProductVendorRepository productVendorRepository;
 
     @Override
     public ResponseEntity<ResponseDTO<ProductDTO>> createProduct(ProductDTO productDTO) {
@@ -41,7 +47,30 @@ public class ProductServiceImpl implements ProductService {
         if (productRepository.findByCodeAndLegalEntityCode(productDTO.getCode(), legalEntity.getCode()).isPresent()) {
             return ResponseEntity.status(HttpStatus.FOUND).body(new ResponseDTO<>("This product is already exist"));
         }
+        if (!CollectionUtils.isEmpty(productDTO.getVendorCodes()) && !CollectionUtils.isEmpty(productDTO.getNewVendors()))
+            return ResponseEntity.ok(new ResponseDTO<>("Conflict vendor assign", productDTO));
         Product product = modelMapper.map(productDTO, Product.class);
+        if (!CollectionUtils.isEmpty(productDTO.getVendorCodes())) {
+            productDTO.getVendorCodes().forEach(providedVendorCode -> {
+                vendorRepository.findByCode(providedVendorCode.getVendorCode()).orElseThrow(() -> new VendorNotFoundException("Cannot find vendor with code: " + providedVendorCode.getVendorCode()));
+                ProductVendor productVendor = new ProductVendor(productDTO.getCode(), providedVendorCode.getVendorCode(), providedVendorCode.getPrice());
+                productVendorRepository.save(productVendor);
+            });
+            productRepository.save(product);
+            return ResponseEntity.ok(new ResponseDTO<>("Product added", productDTO));
+        }
+        if (!CollectionUtils.isEmpty(productDTO.getNewVendors())) {
+            productDTO.getNewVendors().forEach(providedVendor -> {
+                Optional<Vendor> vendor = vendorRepository.findByCode(providedVendor.getVendor().getCode());
+                if (vendor.isPresent())
+                    throw new RuntimeException("This vendor is already exist: " + providedVendor.getVendor().getCode());
+                ProductVendor productVendor = new ProductVendor(productDTO.getCode(), providedVendor.getVendor().getCode(), providedVendor.getPrice());
+                vendorRepository.save(modelMapper.map(providedVendor.getVendor(), Vendor.class));
+                productVendorRepository.save(productVendor);
+            });
+            productRepository.save(product);
+            return ResponseEntity.ok(new ResponseDTO<>("Product added", productDTO));
+        }
         productRepository.save(product);
         return ResponseEntity.ok(new ResponseDTO<>("Product added", productDTO));
     }
@@ -90,5 +119,13 @@ public class ProductServiceImpl implements ProductService {
         return ResponseEntity.ok(new PageResponse<>(productDTOS.getContent(), productDTOS.getPageable().getPageNumber() + 1, productDTOS.getSize(), productDTOS.getTotalPages(), productDTOS.getTotalElements()));
     }
 
-
+    @Override
+    public ResponseEntity<String> assignProductToVedorByCode(ProvidedVendorCode providedVendorCode) {
+        if (productVendorRepository.findByProductCodeAndVendorCode(providedVendorCode.getProductCode(), providedVendorCode.getVendorCode()).isPresent())
+            return ResponseEntity.badRequest().body("This " + providedVendorCode.getProductCode() + " product has been add to " + providedVendorCode.getVendorCode() + " vendor");
+        vendorRepository.findByCode(providedVendorCode.getVendorCode()).orElseThrow(() -> new VendorNotFoundException("Cannot find vendor with code: " + providedVendorCode.getVendorCode()));
+        ProductVendor productVendor = new ProductVendor(providedVendorCode.getProductCode(), providedVendorCode.getVendorCode(), providedVendorCode.getPrice());
+        productVendorRepository.save(productVendor);
+        return ResponseEntity.ok("Assign product successfully");
+    }
 }

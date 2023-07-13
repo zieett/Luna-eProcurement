@@ -2,6 +2,7 @@ package com.rmit.product.controllers;
 
 import com.rmit.product.dto.PageResponse;
 import com.rmit.product.dto.ProductDTO;
+import com.rmit.product.dto.ProvidedVendorCode;
 import com.rmit.product.dto.ResponseDTO;
 import com.rmit.product.entity.product.Product;
 import com.rmit.product.service.ProductService;
@@ -40,6 +41,11 @@ public class ProductController {
     @PostMapping("/product")
     public ResponseEntity<ResponseDTO<ProductDTO>> createProduct(@Valid @RequestBody ProductDTO productDTO) {
         return productService.createProduct(productDTO);
+    }
+
+    @PostMapping("/product/assignToVendor")
+    public ResponseEntity<String> assignProductToVendor(@Valid @RequestBody ProvidedVendorCode providedVendorCode) {
+        return productService.assignProductToVedorByCode(providedVendorCode);
     }
 
     @DeleteMapping("/product/{legalEntityCode}/{productCode}")

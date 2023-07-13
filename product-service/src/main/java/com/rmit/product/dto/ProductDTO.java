@@ -1,5 +1,6 @@
 package com.rmit.product.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.rmit.product.entity.product.Dimension;
 import com.rmit.product.entity.product.MediaFile;
 import jakarta.validation.constraints.NotNull;
@@ -8,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -26,4 +28,8 @@ public class ProductDTO implements Serializable {
     private MediaFile mediaFile;
     @NotNull(message = "Legal Entity Code must not be null")
     private String legalEntityCode;
+    @JsonIgnoreProperties
+    private List<ProvidedVendor> newVendors;
+    @JsonIgnoreProperties
+    private List<ProvidedVendorCode> vendorCodes;
 }
