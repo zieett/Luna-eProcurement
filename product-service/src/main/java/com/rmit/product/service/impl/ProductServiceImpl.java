@@ -116,7 +116,7 @@ public class ProductServiceImpl implements ProductService {
             products = productRepository.searchProductByCodeOrNameOrSku(search, legalEntityCode, pageable);
         else products = productRepository.findAllByLegalEntityCode(legalEntityCode, pageable);
         Page<ProductDTO> productDTOS = products.map(product -> modelMapper.map(product, ProductDTO.class));
-        productDTOS.stream().forEach(productDTO -> productDTO.setProvidedVendorInfoDTOS(productVendorRepository.getVendorNamesByProductCode(productDTO.getCode())));
+        productDTOS.stream().forEach(productDTO -> productDTO.setProvidedVendorInfo(productVendorRepository.getVendorNamesByProductCode(productDTO.getCode())));
         return ResponseEntity.ok(new PageResponse<>(productDTOS.getContent(), productDTOS.getPageable().getPageNumber() + 1, productDTOS.getSize(), productDTOS.getTotalPages(), productDTOS.getTotalElements()));
     }
 
@@ -138,7 +138,7 @@ public class ProductServiceImpl implements ProductService {
         }
         Product product = productRepository.findByCode(productCode).orElseThrow(() -> new ProductNotFoundException("Cannot find product " + productCode));
         ProductDTO productDTO = modelMapper.map(product, ProductDTO.class);
-        productDTO.setProvidedVendorInfoDTOS(productVendorRepository.getVendorNamesByProductCode(productCode));
+        productDTO.setProvidedVendorInfo(productVendorRepository.getVendorNamesByProductCode(productCode));
         return ResponseEntity.ok(productDTO);
     }
 }

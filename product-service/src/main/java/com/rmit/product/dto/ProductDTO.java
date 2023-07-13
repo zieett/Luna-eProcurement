@@ -36,5 +36,5 @@ public class ProductDTO implements Serializable {
     private List<ProvidedVendor> newVendors;
     @JsonIgnore
     private List<ProvidedVendorCode> vendorCodes;
-    private List<ProvidedVendorInfoDTO> providedVendorInfoDTOS;
+    private List<ProvidedVendorInfoDTO> providedVendorInfo;
 }
