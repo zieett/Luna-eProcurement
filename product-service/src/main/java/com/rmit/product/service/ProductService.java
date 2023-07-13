@@ -1,8 +1,8 @@
 package com.rmit.product.service;
 
+import com.rmit.product.dto.AssignVendorDTO;
 import com.rmit.product.dto.PageResponse;
 import com.rmit.product.dto.ProductDTO;
-import com.rmit.product.dto.ProvidedVendorCode;
 import com.rmit.product.dto.ResponseDTO;
 import com.rmit.product.entity.product.Product;
 import org.springframework.http.ResponseEntity;
@@ -20,5 +20,7 @@ public interface ProductService {
 
     ResponseEntity<PageResponse<List<ProductDTO>>> getProductsInLegalEntityPageable(String legalEntityCode, int page, int size, String sortBy, String sortDirection, String search);
 
-    ResponseEntity<String> assignProductToVedorByCode(ProvidedVendorCode providedVendorCode);
+    ResponseEntity<String> assignProductToVendorByCode(AssignVendorDTO assignVendorDTO);
+
+    ResponseEntity<ProductDTO> getProductDetail(String legalEntityCode, String productCode);
 }

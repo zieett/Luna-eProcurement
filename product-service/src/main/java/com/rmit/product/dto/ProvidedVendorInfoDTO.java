@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ProvidedVendorCode {
-    private String vendorCode;
+public class ProvidedVendorInfoDTO {
+    private String vendorName;
     private String price;
 }

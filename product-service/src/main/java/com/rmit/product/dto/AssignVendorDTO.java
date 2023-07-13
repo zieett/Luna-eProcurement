@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ProvidedVendorCode {
+public class AssignVendorDTO {
+    private String productCode;
     private String vendorCode;
     private String price;
 }

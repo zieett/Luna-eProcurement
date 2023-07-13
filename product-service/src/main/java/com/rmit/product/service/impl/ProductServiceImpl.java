@@ -116,16 +116,29 @@ public class ProductServiceImpl implements ProductService {
             products = productRepository.searchProductByCodeOrNameOrSku(search, legalEntityCode, pageable);
         else products = productRepository.findAllByLegalEntityCode(legalEntityCode, pageable);
         Page<ProductDTO> productDTOS = products.map(product -> modelMapper.map(product, ProductDTO.class));
+        productDTOS.stream().forEach(productDTO -> productDTO.setProvidedVendorInfoDTOS(productVendorRepository.getVendorNamesByProductCode(productDTO.getCode())));
         return ResponseEntity.ok(new PageResponse<>(productDTOS.getContent(), productDTOS.getPageable().getPageNumber() + 1, productDTOS.getSize(), productDTOS.getTotalPages(), productDTOS.getTotalElements()));
     }
 
     @Override
-    public ResponseEntity<String> assignProductToVedorByCode(ProvidedVendorCode providedVendorCode) {
-        if (productVendorRepository.findByProductCodeAndVendorCode(providedVendorCode.getProductCode(), providedVendorCode.getVendorCode()).isPresent())
-            return ResponseEntity.badRequest().body("This " + providedVendorCode.getProductCode() + " product has been add to " + providedVendorCode.getVendorCode() + " vendor");
-        vendorRepository.findByCode(providedVendorCode.getVendorCode()).orElseThrow(() -> new VendorNotFoundException("Cannot find vendor with code: " + providedVendorCode.getVendorCode()));
-        ProductVendor productVendor = new ProductVendor(providedVendorCode.getProductCode(), providedVendorCode.getVendorCode(), providedVendorCode.getPrice());
+    public ResponseEntity<String> assignProductToVendorByCode(AssignVendorDTO assignVendorDTO) {
+        if (productVendorRepository.findByProductCodeAndVendorCode(assignVendorDTO.getProductCode(), assignVendorDTO.getVendorCode()).isPresent())
+            return ResponseEntity.badRequest().body("This " + assignVendorDTO.getProductCode() + " product has been add to " + assignVendorDTO.getVendorCode() + " vendor");
+        vendorRepository.findByCode(assignVendorDTO.getVendorCode()).orElseThrow(() -> new VendorNotFoundException("Cannot find vendor with code: " + assignVendorDTO.getVendorCode()));
+        ProductVendor productVendor = new ProductVendor(assignVendorDTO.getProductCode(), assignVendorDTO.getVendorCode(), assignVendorDTO.getPrice());
         productVendorRepository.save(productVendor);
         return ResponseEntity.ok("Assign product successfully");
+    }
+
+    @Override
+    public ResponseEntity<ProductDTO> getProductDetail(String legalEntityCode, String productCode) {
+        LegalEntity legalEntity = accountFeignClient.getLegalEntityByCode(legalEntityCode);
+        if (ObjectUtils.isEmpty(legalEntity)) {
+            throw new LegalEntityNotFoundException("Cannot find legal entity with code: " + legalEntityCode);
+        }
+        Product product = productRepository.findByCode(productCode).orElseThrow(() -> new ProductNotFoundException("Cannot find product " + productCode));
+        ProductDTO productDTO = modelMapper.map(product, ProductDTO.class);
+        productDTO.setProvidedVendorInfoDTOS(productVendorRepository.getVendorNamesByProductCode(productCode));
+        return ResponseEntity.ok(productDTO);
     }
 }

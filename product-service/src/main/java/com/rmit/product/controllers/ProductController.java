@@ -1,8 +1,8 @@
 package com.rmit.product.controllers;
 
+import com.rmit.product.dto.AssignVendorDTO;
 import com.rmit.product.dto.PageResponse;
 import com.rmit.product.dto.ProductDTO;
-import com.rmit.product.dto.ProvidedVendorCode;
 import com.rmit.product.dto.ResponseDTO;
 import com.rmit.product.entity.product.Product;
 import com.rmit.product.service.ProductService;
@@ -38,14 +38,19 @@ public class ProductController {
         return productService.getProductsInLegalEntityPageable(legalEntityCode, page - 1, size, sortBy, sortDirection, search);
     }
 
+    @GetMapping("/product/{legalEntityCode}/{productCode}")
+    public ResponseEntity<ProductDTO> getProductDetail(@PathVariable String legalEntityCode, @PathVariable String productCode) {
+        return productService.getProductDetail(legalEntityCode, productCode);
+    }
+
     @PostMapping("/product")
     public ResponseEntity<ResponseDTO<ProductDTO>> createProduct(@Valid @RequestBody ProductDTO productDTO) {
         return productService.createProduct(productDTO);
     }
 
     @PostMapping("/product/assignToVendor")
-    public ResponseEntity<String> assignProductToVendor(@Valid @RequestBody ProvidedVendorCode providedVendorCode) {
-        return productService.assignProductToVedorByCode(providedVendorCode);
+    public ResponseEntity<String> assignProductToVendor(@Valid @RequestBody AssignVendorDTO assignVendorDTO) {
+        return productService.assignProductToVendorByCode(assignVendorDTO);
     }
 
     @DeleteMapping("/product/{legalEntityCode}/{productCode}")
