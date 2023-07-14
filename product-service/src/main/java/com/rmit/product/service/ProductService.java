@@ -23,4 +23,8 @@ public interface ProductService {
     ResponseEntity<String> assignProductToVendorByCode(AssignVendorDTO assignVendorDTO);
 
     ResponseEntity<ProductDTO> getProductDetail(String legalEntityCode, String productCode);
+
+    ResponseEntity<String> updateProduct(String legalEntityCode, String productCode, ProductDTO productDTO);
+
+    ResponseEntity<String> updateProductPrice(String legalEntityCode, String productCode, String vendorCode, String price);
 }

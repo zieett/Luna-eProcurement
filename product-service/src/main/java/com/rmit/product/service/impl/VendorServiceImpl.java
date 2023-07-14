@@ -1,9 +1,14 @@
 package com.rmit.product.service.impl;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rmit.product.dto.PageResponse;
 import com.rmit.product.dto.ResponseDTO;
 import com.rmit.product.dto.VendorDTO;
+import com.rmit.product.entity.ProductVendor;
 import com.rmit.product.entity.vendor.Vendor;
+import com.rmit.product.exception.VendorNotFoundException;
+import com.rmit.product.repository.ProductVendorRepository;
 import com.rmit.product.repository.VendorRepository;
 import com.rmit.product.service.VendorService;
 import com.rmit.product.ultils.Utils;
@@ -28,6 +33,8 @@ public class VendorServiceImpl implements VendorService {
 
     private final VendorRepository vendorRepository;
     private final ModelMapper modelMapper;
+    private final ProductVendorRepository productVendorRepository;
+    private final ObjectMapper objectMapper;
 
     @Override
     public ResponseEntity<ResponseDTO<VendorDTO>> createVendor(VendorDTO vendorDTO) {
@@ -59,5 +66,25 @@ public class VendorServiceImpl implements VendorService {
         else vendors = vendorRepository.findAll(pageable);
         Page<VendorDTO> vendorDTOS = vendors.map(vendor -> modelMapper.map(vendor, VendorDTO.class));
         return ResponseEntity.ok(new PageResponse<>(vendorDTOS.getContent(), vendorDTOS.getPageable().getPageNumber() + 1, vendorDTOS.getSize(), vendorDTOS.getTotalPages(), vendorDTOS.getTotalElements()));
+    }
+
+    @Override
+    public ResponseEntity<String> deleteVendor(String vendorCode) {
+        Vendor vendor = vendorRepository.findByCode(vendorCode).orElseThrow(() -> new VendorNotFoundException("Cannot find vendor with code: " + vendorCode));
+        vendorRepository.delete(vendor);
+        List<ProductVendor> productVendors = productVendorRepository.findByVendorCode(vendorCode);
+        productVendorRepository.deleteAll(productVendors);
+        return ResponseEntity.ok("Vendor deleted");
+    }
+
+    @Override
+    public ResponseEntity<String> updateVendor(String vendorCode, VendorDTO vendorDTO) {
+        Vendor vendor = vendorRepository.findByCode(vendorCode).orElseThrow(() -> new VendorNotFoundException("Cannot find vendor with code: " + vendorCode));
+        try {
+            vendorRepository.save(objectMapper.updateValue(vendor, vendorDTO));
+        } catch (JsonMappingException e) {
+            throw new RuntimeException(e);
+        }
+        return ResponseEntity.ok("Vendor updated");
     }
 }

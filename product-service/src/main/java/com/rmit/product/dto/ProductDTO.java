@@ -2,6 +2,7 @@ package com.rmit.product.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.rmit.product.entity.product.Dimension;
 import com.rmit.product.entity.product.MediaFile;
 import jakarta.validation.constraints.NotNull;
@@ -18,6 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProductDTO implements Serializable {
     private String name;
     private String description;

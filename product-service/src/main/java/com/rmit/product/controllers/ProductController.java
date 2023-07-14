@@ -57,4 +57,14 @@ public class ProductController {
     public ResponseEntity<String> deleteProduct(@PathVariable String legalEntityCode, @PathVariable String productCode) {
         return productService.deleteProduct(legalEntityCode, productCode);
     }
+
+    @PatchMapping("/product/{legalEntityCode}/{productCode}")
+    public ResponseEntity<String> updateProduct(@PathVariable String legalEntityCode, @PathVariable String productCode, @RequestBody ProductDTO productDTO) {
+        return productService.updateProduct(legalEntityCode, productCode, productDTO);
+    }
+
+    @PatchMapping("/product/{legalEntityCode}/{productCode}/{vendorCode}/{price}")
+    public ResponseEntity<String> updateProductPrice(@PathVariable String legalEntityCode, @PathVariable String productCode, @PathVariable String vendorCode, @PathVariable String price) {
+        return productService.updateProductPrice(legalEntityCode, productCode, vendorCode, price);
+    }
 }

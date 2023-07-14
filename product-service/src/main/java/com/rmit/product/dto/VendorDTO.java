@@ -1,6 +1,7 @@
 package com.rmit.product.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.rmit.product.entity.vendor.Address;
 import com.rmit.product.entity.vendor.Contact;
 import com.rmit.product.entity.vendor.Groups;
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class VendorDTO {
     @NotNull(message = "businessName must not be null")
     private String businessName;

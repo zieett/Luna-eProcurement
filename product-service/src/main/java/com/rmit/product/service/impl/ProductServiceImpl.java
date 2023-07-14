@@ -1,5 +1,7 @@
 package com.rmit.product.service.impl;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rmit.product.dto.*;
 import com.rmit.product.entity.ProductVendor;
 import com.rmit.product.entity.product.Product;
@@ -37,6 +39,8 @@ public class ProductServiceImpl implements ProductService {
     private final AccountFeignClient accountFeignClient;
     private final VendorRepository vendorRepository;
     private final ProductVendorRepository productVendorRepository;
+    private final ObjectMapper objectMapper;
+
 
     @Override
     public ResponseEntity<ResponseDTO<ProductDTO>> createProduct(ProductDTO productDTO) {
@@ -138,9 +142,38 @@ public class ProductServiceImpl implements ProductService {
         if (ObjectUtils.isEmpty(legalEntity)) {
             throw new LegalEntityNotFoundException("Cannot find legal entity with code: " + legalEntityCode);
         }
-        Product product = productRepository.findByCode(productCode).orElseThrow(() -> new ProductNotFoundException("Cannot find product " + productCode));
+        Product product = productRepository.findByCodeAndLegalEntityCode(productCode, legalEntityCode).orElseThrow(() -> new ProductNotFoundException("Cannot find product " + productCode + " in legal entity: " + legalEntityCode));
         ProductDTO productDTO = modelMapper.map(product, ProductDTO.class);
         productDTO.setProvidedVendorInfo(productVendorRepository.getVendorNamesByProductCode(productCode));
         return ResponseEntity.ok(productDTO);
+    }
+
+    @Override
+    public ResponseEntity<String> updateProduct(String legalEntityCode, String productCode, ProductDTO productDTO) {
+        LegalEntity legalEntity = accountFeignClient.getLegalEntityByCode(legalEntityCode);
+        if (ObjectUtils.isEmpty(legalEntity)) {
+            throw new LegalEntityNotFoundException("Cannot find legal entity with code: " + legalEntityCode);
+        }
+        Product product = productRepository.findByCodeAndLegalEntityCode(productCode, legalEntityCode).orElseThrow(() -> new ProductNotFoundException("Cannot find product " + productCode + " in legal entity: " + legalEntityCode));
+        try {
+            productRepository.save(objectMapper.updateValue(product, productDTO));
+        } catch (JsonMappingException e) {
+            throw new RuntimeException(e);
+        }
+        return ResponseEntity.ok("Product updated");
+    }
+
+    @Override
+    public ResponseEntity<String> updateProductPrice(String legalEntityCode, String productCode, String vendorCode, String price) {
+        LegalEntity legalEntity = accountFeignClient.getLegalEntityByCode(legalEntityCode);
+        if (ObjectUtils.isEmpty(legalEntity)) {
+            throw new LegalEntityNotFoundException("Cannot find legal entity with code: " + legalEntityCode);
+        }
+        Product product = productRepository.findByCodeAndLegalEntityCode(productCode, legalEntityCode).orElseThrow(() -> new ProductNotFoundException("Cannot find product " + productCode + " in legal entity: " + legalEntityCode));
+        Vendor vendor = vendorRepository.findByCode(vendorCode).orElseThrow(() -> new VendorNotFoundException("Cannot find vendor with code: " + vendorCode));
+        ProductVendor productVendor = productVendorRepository.findByProductCodeAndVendorCode(product.getCode(), vendor.getCode()).orElseThrow(() -> new VendorNotFoundException("This product is not assign to this vendor"));
+        productVendor.setPrice(price);
+        productVendorRepository.save(productVendor);
+        return ResponseEntity.ok("Product's price updated");
     }
 }

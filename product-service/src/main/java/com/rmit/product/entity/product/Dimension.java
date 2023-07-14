@@ -21,7 +21,4 @@ public class Dimension {
     private String width;
     private String height;
     private String length;
-    @OneToOne(mappedBy = "dimension")
-    @JsonIgnore
-    private Product product;
 }

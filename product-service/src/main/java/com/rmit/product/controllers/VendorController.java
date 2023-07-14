@@ -37,4 +37,14 @@ public class VendorController {
             @RequestParam(defaultValue = "asc") String sortDirection) {
         return vendorService.getVendorsPageable(page - 1, size, sortBy, sortDirection, search);
     }
+
+    @DeleteMapping("/vendor/{vendorCode}")
+    public ResponseEntity<String> deleteVendor(@PathVariable String vendorCode) {
+        return vendorService.deleteVendor(vendorCode);
+    }
+
+    @PatchMapping("/vendor/{vendorCode}")
+    public ResponseEntity<String> updateVendor(@PathVariable String vendorCode, @RequestBody VendorDTO vendorDTO) {
+        return vendorService.updateVendor(vendorCode, vendorDTO);
+    }
 }

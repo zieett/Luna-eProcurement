@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface ProductVendorRepository extends JpaRepository<ProductVendor, Long> {
     Optional<ProductVendor> findByProductCodeAndVendorCode(String productCode, String vendorCode);
 
+    List<ProductVendor> findByVendorCode(String vendorCode);
+
     List<ProductVendor> findByProductCode(String productCode);
 
     @Query("SELECT new com.rmit.product.dto.ProvidedVendorInfoDTO(v.code,v.businessName,pv.price) FROM Vendor v ,ProductVendor pv WHERE " +
