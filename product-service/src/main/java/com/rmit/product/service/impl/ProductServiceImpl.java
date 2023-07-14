@@ -84,6 +84,8 @@ public class ProductServiceImpl implements ProductService {
     public ResponseEntity<String> deleteProduct(String legalEntityCode, String productCode) {
         Product product = productRepository.findByCodeAndLegalEntityCode(productCode, legalEntityCode).orElseThrow(() -> new ProductNotFoundException("Cannot find product with code: " + productCode));
         if (ObjectUtils.isEmpty(product)) return ResponseEntity.ok("Cannot find any product to delete");
+        List<ProductVendor> productVendor = productVendorRepository.findByProductCode(productCode);
+        productVendorRepository.deleteAll(productVendor);
         productRepository.delete(product);
         return ResponseEntity.ok("Product deleted");
     }
