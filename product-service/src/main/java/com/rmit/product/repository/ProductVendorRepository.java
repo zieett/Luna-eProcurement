@@ -15,7 +15,7 @@ public interface ProductVendorRepository extends JpaRepository<ProductVendor, Lo
 
     List<ProductVendor> findByProductCode(String productCode);
 
-    @Query("SELECT new com.rmit.product.dto.ProvidedVendorInfoDTO(v.businessName,pv.price) FROM Vendor v ,ProductVendor pv WHERE " +
+    @Query("SELECT new com.rmit.product.dto.ProvidedVendorInfoDTO(v.code,v.businessName,pv.price) FROM Vendor v ,ProductVendor pv WHERE " +
             "pv.productCode = :productCode " +
             "and pv.vendorCode = v.code"
     )
