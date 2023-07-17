@@ -74,7 +74,6 @@ public class VendorServiceImpl implements VendorService {
         vendorRepository.delete(vendor);
         List<ProductVendor> productVendors = productVendorRepository.findByVendorCode(vendorCode);
         productVendorRepository.deleteAll(productVendors);
-        System.out.println("test");
         return ResponseEntity.ok("Vendor deleted");
     }
 
