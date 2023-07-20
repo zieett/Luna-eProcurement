@@ -1,5 +1,6 @@
 package com.rmit.product.controllers;
 
+import com.rmit.product.dto.ContactDTO;
 import com.rmit.product.dto.PageResponse;
 import com.rmit.product.dto.ResponseDTO;
 import com.rmit.product.dto.VendorDTO;
@@ -46,5 +47,15 @@ public class VendorController {
     @PatchMapping("/vendor/{vendorCode}")
     public ResponseEntity<String> updateVendor(@PathVariable String vendorCode, @RequestBody VendorDTO vendorDTO) {
         return vendorService.updateVendor(vendorCode, vendorDTO);
+    }
+
+    @GetMapping("/vendor/{vendorCode}")
+    public ResponseEntity<VendorDTO> getVendor(@PathVariable String vendorCode) {
+        return vendorService.getVendor(vendorCode);
+    }
+
+    @PostMapping("/vendor/{vendorCode}/addContact")
+    public ResponseEntity<String> addContact(@PathVariable String vendorCode, @RequestBody @Valid ContactDTO contactDTO) {
+        return vendorService.addContact(vendorCode, contactDTO);
     }
 }

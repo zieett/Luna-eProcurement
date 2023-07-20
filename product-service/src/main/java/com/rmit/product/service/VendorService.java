@@ -1,5 +1,6 @@
 package com.rmit.product.service;
 
+import com.rmit.product.dto.ContactDTO;
 import com.rmit.product.dto.PageResponse;
 import com.rmit.product.dto.ResponseDTO;
 import com.rmit.product.dto.VendorDTO;
@@ -19,4 +20,8 @@ public interface VendorService {
     ResponseEntity<String> deleteVendor(String vendorCode);
 
     ResponseEntity<String> updateVendor(String vendorCode, VendorDTO vendorDTO);
+
+    ResponseEntity<VendorDTO> getVendor(String vendorCode);
+
+    ResponseEntity<String> addContact(String vendorCode, ContactDTO contactDTO);
 }

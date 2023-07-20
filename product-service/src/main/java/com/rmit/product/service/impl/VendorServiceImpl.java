@@ -2,10 +2,12 @@ package com.rmit.product.service.impl;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rmit.product.dto.ContactDTO;
 import com.rmit.product.dto.PageResponse;
 import com.rmit.product.dto.ResponseDTO;
 import com.rmit.product.dto.VendorDTO;
 import com.rmit.product.entity.ProductVendor;
+import com.rmit.product.entity.vendor.Contact;
 import com.rmit.product.entity.vendor.Vendor;
 import com.rmit.product.exception.VendorNotFoundException;
 import com.rmit.product.repository.ProductVendorRepository;
@@ -87,5 +89,20 @@ public class VendorServiceImpl implements VendorService {
             throw new RuntimeException(e);
         }
         return ResponseEntity.ok("Vendor updated");
+    }
+
+    @Override
+    public ResponseEntity<VendorDTO> getVendor(String vendorCode) {
+        Vendor vendor = vendorRepository.findByCode(vendorCode).orElseThrow(() -> new VendorNotFoundException("Cannot find vendor with code: " + vendorCode));
+        return ResponseEntity.ok(modelMapper.map(vendor, VendorDTO.class));
+    }
+
+    @Override
+    public ResponseEntity<String> addContact(String vendorCode, ContactDTO contactDTO) {
+        Vendor vendor = vendorRepository.findByCode(vendorCode).orElseThrow(() -> new VendorNotFoundException("Cannot find vendor with code: " + vendorCode));
+        Contact contact = modelMapper.map(contactDTO, Contact.class);
+        vendor.setContact(contact);
+        vendorRepository.save(vendor);
+        return ResponseEntity.ok("Contact added");
     }
 }
