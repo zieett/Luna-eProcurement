@@ -22,4 +22,8 @@ public class Contact {
     private String name;
     private String phone;
     private String position;
+    @ManyToOne
+    @JoinColumn(name = "vendor_id")
+    @JsonIgnore
+    private Vendor vendor;
 }

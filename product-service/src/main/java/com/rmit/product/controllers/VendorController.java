@@ -55,7 +55,9 @@ public class VendorController {
     }
 
     @PostMapping("/vendor/{vendorCode}/addContact")
-    public ResponseEntity<String> addContact(@PathVariable String vendorCode, @RequestBody @Valid ContactDTO contactDTO) {
-        return vendorService.addContact(vendorCode, contactDTO);
+    public ResponseEntity<String> addContact(@PathVariable String vendorCode, @RequestBody List<@Valid ContactDTO> contactDTOS) {
+        return vendorService.addContact(vendorCode, contactDTOS);
     }
+//    @DeleteMapping("/vendor/{vendorCode}/deleteContact/{contactName}")
+//    public ResponseEntity<String>
 }

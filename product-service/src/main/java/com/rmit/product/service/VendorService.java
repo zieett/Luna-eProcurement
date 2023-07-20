@@ -23,5 +23,5 @@ public interface VendorService {
 
     ResponseEntity<VendorDTO> getVendor(String vendorCode);
 
-    ResponseEntity<String> addContact(String vendorCode, ContactDTO contactDTO);
+    ResponseEntity<String> addContact(String vendorCode, List<ContactDTO> contactDTOS);
 }

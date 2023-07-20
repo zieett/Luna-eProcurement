@@ -10,6 +10,7 @@ import com.rmit.product.entity.ProductVendor;
 import com.rmit.product.entity.vendor.Contact;
 import com.rmit.product.entity.vendor.Vendor;
 import com.rmit.product.exception.VendorNotFoundException;
+import com.rmit.product.repository.ContactRepository;
 import com.rmit.product.repository.ProductVendorRepository;
 import com.rmit.product.repository.VendorRepository;
 import com.rmit.product.service.VendorService;
@@ -36,6 +37,7 @@ public class VendorServiceImpl implements VendorService {
     private final VendorRepository vendorRepository;
     private final ModelMapper modelMapper;
     private final ProductVendorRepository productVendorRepository;
+    private final ContactRepository contactRepository;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -98,10 +100,17 @@ public class VendorServiceImpl implements VendorService {
     }
 
     @Override
-    public ResponseEntity<String> addContact(String vendorCode, ContactDTO contactDTO) {
+    public ResponseEntity<String> addContact(String vendorCode, List<ContactDTO> contactDTOS) {
         Vendor vendor = vendorRepository.findByCode(vendorCode).orElseThrow(() -> new VendorNotFoundException("Cannot find vendor with code: " + vendorCode));
-        Contact contact = modelMapper.map(contactDTO, Contact.class);
-        vendor.setContact(contact);
+        List<Contact> contacts = vendor.getContacts();
+        for (ContactDTO dto : contactDTOS) {
+            if (contactRepository.findByNameAndVendor_Code(dto.getName(), vendorCode).isPresent()) {
+                return ResponseEntity.badRequest().body("Contact " + dto.getName() + " is already exist");
+            }
+        }
+        List<Contact> newContacts = contactDTOS.stream().map(contactDTO -> modelMapper.map(contactDTO, Contact.class)).toList();
+        contacts.addAll(newContacts);
+        vendor.setContacts(contacts);
         vendorRepository.save(vendor);
         return ResponseEntity.ok("Contact added");
     }
