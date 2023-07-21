@@ -1,6 +1,7 @@
 package com.rmit.product.exception;
 
 import lombok.RequiredArgsConstructor;
+import org.hibernate.JDBCException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -25,6 +26,13 @@ public class CustomResponseEntityException extends ResponseEntityExceptionHandle
         ErrorDetail errorDetail = new ErrorDetail(LocalDateTime.now().format(dateTimeFormatter), ex.getMessage(),
                 request.getDescription(false));
         return new ResponseEntity<>(errorDetail, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler({JDBCException.class})
+    public final ResponseEntity<Object> JdbcException(Exception ex, WebRequest request) {
+        ErrorDetail errorDetail = new ErrorDetail(LocalDateTime.now().format(dateTimeFormatter), ex.getCause().getCause().getMessage(),
+                request.getDescription(false));
+        return new ResponseEntity<>(errorDetail, HttpStatus.BAD_REQUEST);
     }
 
     @Override

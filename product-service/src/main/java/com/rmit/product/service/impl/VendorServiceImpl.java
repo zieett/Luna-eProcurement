@@ -103,11 +103,6 @@ public class VendorServiceImpl implements VendorService {
     public ResponseEntity<String> addContact(String vendorCode, List<ContactDTO> contactDTOS) {
         Vendor vendor = vendorRepository.findByCode(vendorCode).orElseThrow(() -> new VendorNotFoundException("Cannot find vendor with code: " + vendorCode));
         List<Contact> contacts = vendor.getContacts();
-        for (ContactDTO dto : contactDTOS) {
-            if (contactRepository.findByNameAndVendor_Code(dto.getName(), vendorCode).isPresent()) {
-                return ResponseEntity.badRequest().body("Contact " + dto.getName() + " is already exist");
-            }
-        }
         List<Contact> newContacts = contactDTOS.stream().map(contactDTO -> modelMapper.map(contactDTO, Contact.class)).toList();
         contacts.addAll(newContacts);
         vendor.setContacts(contacts);

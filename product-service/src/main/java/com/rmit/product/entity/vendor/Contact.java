@@ -11,7 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "vendor_contact")
+@Table(name = "vendor_contact",
+        uniqueConstraints =
+        @UniqueConstraint(columnNames = {"name", "vendor_id"})
+)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Contact {
 
@@ -26,4 +29,5 @@ public class Contact {
     @JoinColumn(name = "vendor_id")
     @JsonIgnore
     private Vendor vendor;
+
 }
