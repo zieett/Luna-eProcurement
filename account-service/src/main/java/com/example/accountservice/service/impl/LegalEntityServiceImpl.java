@@ -5,6 +5,7 @@ import com.example.accountservice.entity.Account;
 import com.example.accountservice.entity.Department;
 import com.example.accountservice.entity.LegalEntity;
 import com.example.accountservice.entity.Team;
+import com.example.accountservice.enums.Roles;
 import com.example.accountservice.exception.AccountNotFoundException;
 import com.example.accountservice.exception.DepartmentNotFoundException;
 import com.example.accountservice.exception.LegalEntityNotFoundException;
@@ -51,13 +52,15 @@ public class LegalEntityServiceImpl implements LegalEntityService {
         try {
             JWTPayload jwtPayload = objectMapper.readValue(userInfo, JWTPayload.class);
             Account account = accountRepository.findByEmail(jwtPayload.getSub()).orElseThrow(
-                () -> new AccountNotFoundException("Cannot find account with email: " + jwtPayload.getSub()));
+                    () -> new AccountNotFoundException("Cannot find account with email: " + jwtPayload.getSub()));
             LegalEntity legalEntity = modelMapper.map(legalEntityDTO, LegalEntity.class);
             legalEntityRepository.save(legalEntity);
             account.setLegalEntityCode(legalEntity.getCode());
+            SetRoleDTO setRoleDTO = new SetRoleDTO(jwtPayload.getSub(), Roles.MANAGER);
+            authFeignClient.setRole(setRoleDTO);
             accountRepository.save(account);
             return ResponseEntity.ok(
-                new ResponseDTO("Successfully create and join legal entity", HttpStatus.OK.value()));
+                    new ResponseDTO("Successfully create and join legal entity", HttpStatus.OK.value()));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
